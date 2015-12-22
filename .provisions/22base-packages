@@ -1,0 +1,7 @@
+#!/bin/sh
+
+export DEBIAN_FRONTEND=noninteractive
+
+apt-get install -y zsh bash-completion lv vim nano- git tig wget curl dnsutils jq
+apt-get install -y manpages-ja manpages-ja-dev vim-doc
+apt-get install -y linux-headers-$(uname -r)

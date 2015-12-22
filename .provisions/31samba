@@ -1,0 +1,22 @@
+#!/bin/sh
+
+HOSTS_ALLOW=$1
+
+apt-get install -y samba
+
+cat <<DATA > /etc/samba/smb.conf
+[global]
+    domain master = no
+    server role = standalone server
+    server string = %h server
+    map to guest = bad user
+    map archive = no
+    oplocks = no
+    printing = bsd
+    load printers = no
+    printcap name = /dev/null
+    read only = no
+    guest ok = yes
+    create mask = 0644
+    hosts allow = $HOSTS_ALLOW
+DATA

@@ -1,0 +1,8 @@
+#!/bin/sh
+
+NAME=$1
+
+getent group docker > /dev/null
+if [ $? -eq 0 ]; then
+    adduser $NAME docker
+fi

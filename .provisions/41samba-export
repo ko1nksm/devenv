@@ -1,0 +1,13 @@
+#!/bin/sh
+
+NAME=$1
+DIR=$2
+USER=$3
+
+cat <<DATA >> /etc/samba/smb.conf
+[$NAME]
+    path = $DIR
+    force user = $USER
+DATA
+
+service smbd restart
