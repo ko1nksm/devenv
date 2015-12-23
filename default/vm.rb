@@ -13,4 +13,5 @@ config.vm.provision "shell", inline: <<-SHELL
   provide 31samba '192.168.33.'
   provide 40user-config #{USERNAME}
   provide 41samba-export #{USERNAME} ~#{USERNAME} #{USERNAME}
+  #{COMPLETE}
 SHELL
