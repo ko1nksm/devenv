@@ -1,5 +1,7 @@
 #!/bin/sh
 
+name=$1
+
 COMPOSE_VERSION=1.5.2
 MACHINE_VERSION=v0.5.4
 
@@ -16,3 +18,7 @@ MACHINE_URL=https://github.com/docker/machine/releases/download/v0.5.4/docker-ma
 MACHINE_PATH=/usr/local/bin/docker-machine
 curl -sSL $MACHINE_URL > $MACHINE_PATH
 chmod +x $MACHINE_PATH
+
+if [ "$name" ]; then
+  adduser $name docker
+fi
