@@ -43,7 +43,7 @@ Vagrant.configure(2) do |config|
       #{COMPLETE}
     SHELL
 
-    dev.enumerate_vms(File.dirname(__FILE__)) do |name, include_vm|
+    dev.enumerate_vms(File.dirname(__FILE__)) do |name, config, include_vm|
       config.vm.hostname = name + '.local'
       config.vm.provider :virtualbox do |vb|
         vb.name = config.vm.hostname
