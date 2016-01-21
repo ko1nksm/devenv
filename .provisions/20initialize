@@ -28,5 +28,5 @@ Pin: release n=$CODENAME-updates
 Pin-Priority: 995
 DATA
 
-echo linux-image-amd64 hold | dpkg --set-selections
 apt-get update -y
+apt-get install -y linux-headers-amd64 virtualbox-guest-dkms
