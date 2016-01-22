@@ -50,7 +50,7 @@ Vagrant.configure(2) do |config|
     dev.enumerate_vms(File.dirname(__FILE__)) do |name, config, include_vm|
       config.vm.hostname = name + '.local'
       config.vm.provider :virtualbox do |vb|
-        vb.name = config.vm.hostname
+        vb.name = name + '@devenv'
         vb.description <<-HERE.gsub(/^\s+/, '')
           HOST: #{name}.local
         HERE
