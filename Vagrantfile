@@ -13,6 +13,7 @@ Vagrant.configure(2) do |config|
   config.vm.provider :virtualbox do |vb|
     vb.cpus = 4
     vb.memory = 2048
+    vb.customize ['modifyvm', :id, '--groups', '/devenv']
     vb.customize ['modifyvm', :id, '--paravirtprovider', 'kvm' ]
     vb.customize ['modifyvm', :id, '--bioslogofadein', 'off']
     vb.customize ['modifyvm', :id, '--bioslogofadeout', 'off']
