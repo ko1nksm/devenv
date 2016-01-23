@@ -19,6 +19,7 @@ Vagrant.configure(2) do |config|
     vb.customize ['modifyvm', :id, '--bioslogofadeout', 'off']
     vb.customize ['modifyvm', :id, '--bioslogodisplaytime', 0]
     vb.customize ['setextradata', :id, 'VBoxInternal/Devices/VMMDev/0/Config/GetHostTimeDisabled', 0]
+    #vb.linked_clone = true
   end
 
   config.vm.provision "shell", privileged: false, inline: <<-SHELL
