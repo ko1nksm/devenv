@@ -7,6 +7,8 @@ STORAGE_DIR = ENV['HOME'] unless defined? STORAGE_DIR
 
 Vagrant.configure(2) do |config|
   config.vm.box = "debian/jessie64"
+  config.vm.box_version = "0"
+  config.vm.box_check_update = false
 
   config.vm.define 'default', primary: true
 
