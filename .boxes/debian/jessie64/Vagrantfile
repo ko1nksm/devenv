@@ -1,0 +1,55 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure(2) do |config|
+  config.vm.box = "debian/jessie64"
+  config.vm.box_version = ENV['LATEST_BOX_VERSION'] || "8.2.1"
+  config.vm.box_check_update = true
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = "1024"
+  end
+
+  repourl='http://httpredir.debian.org/debian'
+  codename='jessie'
+  section='main contrib non-free'
+
+  sources_list = <<-HERE.gsub(/^\s+/, '')
+    deb #{repourl} #{codename} #{section}
+    deb-src #{repourl} #{codename} #{section}
+
+    deb http://security.debian.org/ #{codename}/updates #{section}
+    deb-src http://security.debian.org/ #{codename}/updates #{section}
+
+    deb #{repourl} #{codename}-updates #{section}
+    deb-src #{repourl} #{codename}-updates #{section}
+
+    deb #{repourl} #{codename}-backports #{section}
+    deb-src #{repourl} #{codename}-backports #{section}
+  HERE
+
+  preferences = <<-HERE.gsub(/^\s+/, '')
+    Package: *
+    Pin: release n=#{codename}-backports
+    Pin-Priority: 992
+
+    Package: *
+    Pin: release n=#{codename}-updates
+    Pin-Priority: 995
+  HERE
+
+  config.vm.provision "shell", inline: <<-SHELL
+    set -e
+    export DEBIAN_FRONTEND=noninteractive
+    echo "#{sources_list}" > /etc/apt/sources.list
+    echo "#{preferences}" > /etc/apt/preferences
+    apt-get -y update
+    apt-get -y upgrade
+    apt-get -y dist-upgrade
+    apt-get -y install linux-headers-amd64 virtualbox-guest-dkms
+    apt-get -y autoremove
+    apt-get clean
+    set +e
+    dd if=/dev/zero of=zero bs=1MiB
+    rm zero
+  SHELL
+end
