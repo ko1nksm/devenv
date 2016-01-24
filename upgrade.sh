@@ -4,6 +4,8 @@ set -eu
 
 cd $(dirname $0)
 
+TAB=$(printf "\t")
+
 upgrade_box=""
 recreate=""
 
@@ -93,20 +95,48 @@ recreate_vm() {
 }
 
 destroy_vm() {
-  if [ -f "$1/before-destroy.sh" ]; then
-    . "$1/before-destroy.sh"
-  elif [ -f "./before-destroy.sh" ]; then
-    . "./before-destroy.sh"
-  fi
+  local key value storagectl port device
+  getextradata "$1" "vagrant-dev/attach_storage" | while IFS= read -r line; do
+    key=${line%%$TAB*}
+    value=${line#*$TAB}
+
+    storagectl=${key%%-*}
+    port=${key#*-}
+    device=${port#*-}
+    port=${port%%-*}
+
+    if [ "$value" ]; then
+      detachstorage "$1" "$storagectl" "$port" "$device"
+    fi
+  done
   vagrant destroy -f "$1"
 }
 
-detach_storage() {
-  local uuid
-
+detachstorage() {
+  local uuid medium
   uuid=$(vm_uuid "$1")
-  echo "$1: Detach storage $2 port:$3 device:$4"
+  medium=$(getmedium "$@")
+  printf "$1: Detach storage $2 port:$3 device:$4 (%s)\n" "$medium"
   VBoxManage storageattach "$uuid" --storagectl "$2" --port "$3" --device "$4" --medium none
+}
+
+getmedium() {
+  local uuid
+  uuid=$(vm_uuid "$1")
+  VBoxManage showvminfo "$uuid" --machinereadable | grep "\"$2-$3-$4\"=" | sed "s/[^=]*=//"
+}
+
+getextradata() {
+  local uuid
+  uuid=$(vm_uuid "$1")
+  path=${2:-}
+  [ $path ] && path="$path/"
+  VBoxManage getextradata "$uuid" enumerate | while IFS= read -r line; do
+    case $line in
+      "Key: $path"*)
+        echo ${line#Key: $path} | sed "s/, Value: /$TAB/"
+    esac
+  done
 }
 
 vm_uuid() {
