@@ -5,9 +5,12 @@ set -eu
 cd $(dirname $0)
 
 TAB=$(printf "\t")
-
 upgrade_box=""
 recreate=""
+
+if [ -f ./hooks.sh ]; then
+  . ./hooks.sh
+fi
 
 usage() {
 cat <<TEXT
@@ -24,6 +27,15 @@ exit
 abort() {
   printf "\033[0;31m%s\033[0;39m\n" "$1"
   exit 1
+}
+
+call_hook() {
+  local name=$1
+  shift
+
+  if type $name >/dev/null 2>&1; then
+    "$name" "$@"
+  fi
 }
 
 upgrade_boxes() {
@@ -78,11 +90,13 @@ recreate_vm() {
   case $status in
     running)
       vagrant halt "$vm"
-      destroy_vm "$vm"
+      call_hook before_destroy "$vm"
+      vagrant destroy -f "$vm"
       vagrant up "$vm" --provision
       ;;
     poweroff | aborted)
-      destroy_vm "$vm"
+      call_hook before_destroy "$vm"
+      vagrant destroy -f "$vm"
       vagrant up "$vm" --provision
       vagrant halt "$vm"
       ;;
@@ -92,24 +106,6 @@ recreate_vm() {
     *)
       abort "Unsupport status '$status'"
   esac
-}
-
-destroy_vm() {
-  local key value storagectl port device
-  getextradata "$1" "vagrant-dev/attach_storage" | while IFS= read -r line; do
-    key=${line%%$TAB*}
-    value=${line#*$TAB}
-
-    storagectl=${key%%-*}
-    port=${key#*-}
-    device=${port#*-}
-    port=${port%%-*}
-
-    if [ "$value" ]; then
-      detachstorage "$1" "$storagectl" "$port" "$device"
-    fi
-  done
-  vagrant destroy -f "$1"
 }
 
 detachstorage() {
