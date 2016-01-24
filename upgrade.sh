@@ -102,8 +102,18 @@ destroy_vm() {
 }
 
 detach_storage() {
+  local uuid
+
+  uuid=$(vm_uuid "$1")
   echo "$1: Detach storage $2 port:$3 device:$4"
-  VBoxManage storageattach "$1@devenv" --storagectl "$2" --port "$3" --device "$4" --medium none
+  VBoxManage storageattach "$uuid" --storagectl "$2" --port "$3" --device "$4" --medium none
+}
+
+vm_uuid() {
+  local id_file=".vagrant/machines/$1/virtualbox/id"
+  if [ -f $id_file ]; then
+    cat "$id_file"
+  fi
 }
 
 if [ $# -eq 0 ]; then
