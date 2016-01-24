@@ -7,13 +7,21 @@ name=$1
 workdir=$(dirname $0)/$name
 cd $workdir
 
-if [ -f package.box ]; then
-  echo -e "\033[0;31m$workdir/package.box already exists.\033[0;39m"
+abort() {
+  printf "\033[0;31m%s\033[0;39m\n" "$1"
   exit 1
+}
+
+info() {
+  printf "\033[1;33m%s\033[0;39m\n" "$1"
+}
+
+if [ -f package.box ]; then
+  abort "$workdir/package.box already exists."
 fi
 
 if vagrant box list | grep "$name (virtualbox, 0)" >/dev/null; then
-  echo "Found updated box"
+  info "Found updated box"
   export LATEST_BOX_VERSION=0
 fi
 vagrant halt
@@ -24,10 +32,10 @@ vagrant halt
 vagrant package
 if [ -f package.box ]; then
   size=$(wc -c < package.box)
-  echo -e "\033[1;33mGenerated package.box [$(expr $size / 1024 / 1024) MB]\033[0;39m"
+  info "Generated package.box [$(expr $size / 1024 / 1024) MB]"
   vagrant box add package.box --name "$name" --force
   rm package.box
   vagrant destroy --force
 else
-  echo "Not found package.box"
+  abort "Not found package.box"
 fi
