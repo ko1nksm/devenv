@@ -48,7 +48,7 @@ upgrade_vm() {
 
   status=$(status_vm "$vm")
 
-  echo "upgrade $vm ($status)"
+  echo "Upgrade $vm ($status)"
 
   case $status in
     running)
@@ -71,7 +71,7 @@ recreate_vm() {
 
   status=$(status_vm "$vm")
 
-  echo "recreate $vm ($status)"
+  echo "Recreate $vm ($status)"
 
   case $status in
     running)
@@ -111,7 +111,7 @@ detach_storage() {
 
 vm_uuid() {
   local id_file=".vagrant/machines/$1/virtualbox/id"
-  if [ -f $id_file ]; then
+  if [ -d $1 -a -f $id_file ]; then
     cat "$id_file"
   fi
 }
@@ -137,13 +137,13 @@ for vm in "$@"; do
   case $vm in
     -*) continue
   esac
-  if [ -f "$vm/vm.rb" ]; then
+  if [ $(vm_uuid $vm) ]; then
     if [ $recreate ]; then
       recreate_vm "$vm"
     else
       upgrade_vm "$vm"
     fi
   else
-    abort "Not found vm $vm"
+    abort "Specified VM '$vm' is not created by vagrant"
   fi
 done
