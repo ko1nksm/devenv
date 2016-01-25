@@ -5,7 +5,6 @@ set -eu
 cd $(dirname $0)
 
 TAB=$(printf "\t")
-recreate=""
 
 if [ -f ./hooks.sh ]; then
   . ./hooks.sh
@@ -13,11 +12,13 @@ fi
 
 usage() {
 cat <<TEXT
-Usage: Upgrade [OPTION]... [VM]...
+Usage: manage.sh [ -h | --help ]
+  Display help
 
-OPTION:
-  -r, --recreate  destroy vm and recreate
-  -h, --help      display help
+Usage: manage.sh upgrade [OPTION]... [VM]...
+
+  OPTION:
+    -r, --recreate  destroy vm and recreate
 TEXT
 exit
 }
@@ -128,29 +129,44 @@ recreate_vm() {
   esac
 }
 
+upgrade() {
+  local param recreate=""
+
+  for param in "$@"; do
+    case $param in
+      -r | --recreate)  recreate=1 ;;
+      -*) abort "Unknown option $param"
+    esac
+  done
+
+  for vm in "$@"; do
+    case $vm in
+      -*) continue
+    esac
+
+    if [ $(vagrant_vmid $vm) ]; then
+      if [ $recreate ]; then
+        recreate_vm "$vm"
+      else
+        upgrade_vm "$vm"
+      fi
+    else
+      abort "Specified VM '$vm' is not created by vagrant"
+    fi
+  done
+}
+
 if [ $# -eq 0 ]; then
   usage
 fi
 
 for param in "$@"; do
   case $param in
-    -r | --recreate)  recreate=1 ;;
     -h | --help) usage ;;
-    -*) abort "Unknown option $param"
   esac
 done
 
-for vm in "$@"; do
-  case $vm in
-    -*) continue
-  esac
-  if [ $(vagrant_vmid $vm) ]; then
-    if [ $recreate ]; then
-      recreate_vm "$vm"
-    else
-      upgrade_vm "$vm"
-    fi
-  else
-    abort "Specified VM '$vm' is not created by vagrant"
-  fi
-done
+case $1 in
+  upgrade) $@ ;;
+  *) abort "Unknown command '$1'"
+esac
