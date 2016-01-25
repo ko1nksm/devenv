@@ -11,11 +11,14 @@ cat <<TEXT
 Usage: manage.sh [ -h | --help ]
   Display help
 
-Usage: manage.sh build [BOX]...
-  Build box
+Usage: manage.sh build [OPTION]... [BOX]...
+  Build box(es)
+
+  OPTION:
+    -a, --all       build all box
 
 Usage: manage.sh upgrade [OPTION]... [VM]...
-  Upgrade vm
+  Upgrade vm(s)
 
   OPTION:
     -r, --recreate  destroy vm and recreate
@@ -136,10 +139,35 @@ recreate_vm() {
 }
 
 build() {
-  local box workdir size
+  local box workdir size all="" boxes
 
-  for box in "$@"; do
-    workdir="$BASEDIR/.boxes/$box"
+  for param in "$@"; do
+    case $param in
+      -a | --all) all=1 ;;
+      -*) abort "Unknown option $param"
+    esac
+  done
+
+  if [ $# -eq 0 ]; then
+    info "Box name(s) must be specified from list below or specify --all option"
+    list_boxes
+    exit
+  fi
+
+  if [ "$all" ]; then
+    boxes=$(list_boxes)
+  else
+    boxes=$@
+  fi
+
+  for box in $boxes; do
+    case $box in -*) continue; esac
+
+    workdir="$BOXESDIR/$box"
+    if [ ! -d "$workdir" ]; then
+      abort "Not found box directory"
+    fi
+
     cd "$workdir"
 
     if [ -f package.box ]; then
@@ -169,6 +197,15 @@ build() {
   done
 }
 
+list_boxes() {
+  cd "$BOXESDIR"
+  find . -name Vagrantfile | while IFS= read name; do
+    name=$(echo "${name#./}")
+    name=$(echo "${name%/Vagrantfile}")
+    echo "$name"
+  done
+}
+
 upgrade() {
   local param recreate=""
 
@@ -180,9 +217,7 @@ upgrade() {
   done
 
   for vm in "$@"; do
-    case $vm in
-      -*) continue
-    esac
+    case $vm in -*) continue; esac
 
     if [ $(vagrant_vmid $vm) ]; then
       if [ $recreate ]; then
