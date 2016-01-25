@@ -1,3 +1,5 @@
 #!/bin/sh
 
+export DEBIAN_FRONTEND=noninteractive
+
 apt-get install -y xauth gconf2 xli fonts-droid fonts-ipafont

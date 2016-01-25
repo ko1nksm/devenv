@@ -15,11 +15,11 @@ config.vm.provision "shell", inline: <<-SHELL
   #{BOOTSTRAP(vmname)}
   create-partition "/dev/sdc"
   mount-partition "DOCKER", "/dev/sdc1" "/var/lib/docker"
-  provide 10config
-  provide 21upgrade
-  provide 22base-packages
-  provide 31docker #{USERNAME}
-  provide 31samba '192.168.33.'
-  provide 41samba-export #{USERNAME} ~#{USERNAME} #{USERNAME}
+  provide system
+  provide upgrade
+  provide packages
+  provide docker-tools #{USERNAME}
+  provide samba '192.168.33.'
+  provide samba-export #{USERNAME} ~#{USERNAME} #{USERNAME}
   #{COMPLETE}
 SHELL
