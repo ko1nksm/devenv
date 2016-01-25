@@ -45,7 +45,7 @@ Vagrant.configure(2) do |config|
     config.vm.provision "shell", inline: <<-SHELL
       #{BOOTSTRAP()}
       create-partition "/dev/sdb"
-      create-user "#{USERNAME}" "#{USERNAME}"
+      create-user "#{USERNAME}" "#{USERNAME}" /bin/zsh
       mount-partition "HOME" "/dev/sdb1" "/home/#{USERNAME}" "#{USERNAME}"
       insert-authorized-keys "#{USERNAME}" "#{READ KEY_FILE}"
       create-setup "#{USERNAME}" '#{SETUP}'
