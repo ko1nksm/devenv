@@ -16,6 +16,7 @@ Usage: manage.sh build [OPTION]... [BOX]...
 
   OPTION:
     -a, --all       build all box
+    -d, --debug     keep vm for debug
 
 Usage: manage.sh upgrade [OPTION]... [VM]...
   Upgrade vm(s)
@@ -139,11 +140,12 @@ recreate_vm() {
 }
 
 build() {
-  local box workdir size all="" boxes
+  local box workdir size all="" debug="" boxes
 
   for param in "$@"; do
     case $param in
       -a | --all) all=1 ;;
+      -d | --debug) debug=1 ;;
       -*) abort "Unknown option $param"
     esac
   done
@@ -181,6 +183,7 @@ build() {
 
     vagrant halt
     vagrant up --provision
+    [ "$debug" ] && continue
     vagrant reload
     vagrant ssh -c "sudo sh /cleanup"
     vagrant halt
