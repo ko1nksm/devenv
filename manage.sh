@@ -3,13 +3,8 @@
 set -eu
 
 BASEDIR="$(dirname $0)"
+BOXESDIR="$BASEDIR/.boxes"
 TAB=$(printf "\t")
-
-cd "$BASEDIR"
-
-if [ -f ./hooks.sh ]; then
-  . ./hooks.sh
-fi
 
 usage() {
 cat <<TEXT
@@ -35,15 +30,6 @@ abort() {
 
 info() {
   printf "\033[1;33m%s\033[0;39m\n" "$1"
-}
-
-call_hook() {
-  local name="$1"
-  shift
-
-  if type "$name" >/dev/null 2>&1; then
-    "$name" "$@"
-  fi
 }
 
 vagrant_status() {
@@ -87,6 +73,17 @@ vbox_getextradata() {
   done
 }
 
+detach_storage() {
+  local vm=$1 line key value
+  vbox_getextradata "$vm" "vagrant-dev/attach_storage" | while IFS= read -r line; do
+    key=${line%%$TAB*}
+    value=${line#*$TAB}
+    if [ "$value" ]; then
+      vbox_detachstorage "$vm" "$key"
+    fi
+  done
+}
+
 upgrade_vm() {
   local status
 
@@ -120,12 +117,12 @@ recreate_vm() {
   case $status in
     running)
       vagrant halt "$vm"
-      call_hook before_destroy "$vm"
+      detach_storage "$vm"
       vagrant destroy -f "$vm"
       vagrant up "$vm" --provision
       ;;
     poweroff | aborted)
-      call_hook before_destroy "$vm"
+      detach_storage "$vm"
       vagrant destroy -f "$vm"
       vagrant up "$vm" --provision
       vagrant halt "$vm"
@@ -198,6 +195,8 @@ upgrade() {
     fi
   done
 }
+
+cd "$BASEDIR"
 
 if [ $# -eq 0 ]; then
   usage
