@@ -5,7 +5,6 @@ set -eu
 cd $(dirname $0)
 
 TAB=$(printf "\t")
-upgrade_box=""
 recreate=""
 
 if [ -f ./hooks.sh ]; then
@@ -17,7 +16,6 @@ cat <<TEXT
 Usage: Upgrade [OPTION]... [VM]...
 
 OPTION:
-  -b, --box       upgrade boxes
   -r, --recreate  destroy vm and recreate
   -h, --help      display help
 TEXT
@@ -79,17 +77,6 @@ vbox_getextradata() {
   done
 }
 
-upgrade_boxes() {
-  local name
-  cd .boxes
-  find . -name Vagrantfile | while IFS= read name; do
-    name=$(echo "${name#./}")
-    name=$(echo "${name%/Vagrantfile}")
-    ./build.sh "$name"
-  done
-  cd ..
-}
-
 upgrade_vm() {
   local status
 
@@ -147,16 +134,11 @@ fi
 
 for param in "$@"; do
   case $param in
-    -b | --box)       upgrade_box=1 ;;
     -r | --recreate)  recreate=1 ;;
     -h | --help) usage ;;
     -*) abort "Unknown option $param"
   esac
 done
-
-if [ $upgrade_box ]; then
-  upgrade_boxes
-fi
 
 for vm in "$@"; do
   case $vm in
