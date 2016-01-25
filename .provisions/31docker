@@ -5,10 +5,6 @@ name=$1
 COMPOSE_VERSION=1.5.2
 MACHINE_VERSION=v0.5.4
 
-if ! type docker >/dev/null 2>&1; then
-  curl -sSL https://get.docker.com | sh
-fi
-
 COMPOSE_URL=https://github.com/docker/compose/releases/download/$COMPOSE_VERSION/docker-compose-`uname -s`-`uname -m`
 COMPOSE_PATH=/usr/local/bin/docker-compose
 curl -sSL $COMPOSE_URL > $COMPOSE_PATH
