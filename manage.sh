@@ -161,8 +161,10 @@ build() {
     [ -f package.box ] && abort "$workdir/package.box already exists."
 
     if vagrant box list | grep "$box (virtualbox, 0)" >/dev/null; then
-      info "Found updated box"
+      info "Found latest box"
       export LATEST_BOX_VERSION=0
+    else
+      unset LATEST_BOX_VERSION
     fi
 
     vagrant halt
