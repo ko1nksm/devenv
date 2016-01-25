@@ -2,9 +2,10 @@
 
 set -eu
 
-cd $(dirname $0)
-
+BASEDIR="$(dirname $0)"
 TAB=$(printf "\t")
+
+cd "$BASEDIR"
 
 if [ -f ./hooks.sh ]; then
   . ./hooks.sh
@@ -15,7 +16,11 @@ cat <<TEXT
 Usage: manage.sh [ -h | --help ]
   Display help
 
+Usage: manage.sh build [BOX]...
+  Build box
+
 Usage: manage.sh upgrade [OPTION]... [VM]...
+  Upgrade vm
 
   OPTION:
     -r, --recreate  destroy vm and recreate
@@ -26,6 +31,10 @@ exit
 abort() {
   printf "\033[0;31m%s\033[0;39m\n" "$1"
   exit 1
+}
+
+info() {
+  printf "\033[1;33m%s\033[0;39m\n" "$1"
 }
 
 call_hook() {
@@ -129,6 +138,40 @@ recreate_vm() {
   esac
 }
 
+build() {
+  local box workdir size
+
+  for box in "$@"; do
+    workdir="$BASEDIR/.boxes/$box"
+    cd "$workdir"
+
+    if [ -f package.box ]; then
+      abort "$workdir/package.box already exists."
+    fi
+
+    if vagrant box list | grep "$box (virtualbox, 0)" >/dev/null; then
+      info "Found updated box"
+      export LATEST_BOX_VERSION=0
+    fi
+
+    vagrant halt
+    vagrant up --provision
+    vagrant reload
+    vagrant ssh -c "sudo sh /cleanup"
+    vagrant halt
+    vagrant package
+    if [ -f package.box ]; then
+      size=$(wc -c < package.box)
+      info "Generated package.box [$(expr $size / 1024 / 1024) MB]"
+      vagrant box add package.box --name "$box" --force
+      rm package.box
+      vagrant destroy --force
+    else
+      abort "Not found package.box"
+    fi
+  done
+}
+
 upgrade() {
   local param recreate=""
 
@@ -167,6 +210,7 @@ for param in "$@"; do
 done
 
 case $1 in
+  build) $@ ;;
   upgrade) $@ ;;
   *) abort "Unknown command '$1'"
 esac
