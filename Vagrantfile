@@ -24,10 +24,6 @@ Vagrant.configure(2) do |config|
     #vb.linked_clone = true
   end
 
-  config.vm.provision "shell", privileged: false, inline: <<-SHELL
-    sudo sed -i '/tty/!s/mesg n/tty -s \\&\\& mesg n/' /root/.profile
-  SHELL
-
   if Vagrant.has_plugin?("vagrant-hostmanager")
     config.hostmanager.enabled = true
     config.hostmanager.manage_host = true
