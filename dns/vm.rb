@@ -3,7 +3,6 @@ config.vm.network "private_network", ip: '192.168.33.12'
 config.vm.provision "shell", inline: <<-SHELL
   #{BOOTSTRAP(vmname)}
   provide 10config
-  provide 20initialize
   provide 21upgrade
   provide 22base-packages
   provide 31docker #{USERNAME}

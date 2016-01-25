@@ -11,6 +11,8 @@ if [ "$old_kernels" ]; then
   apt-get clean
 fi
 
+ln -s -f /dev/null /etc/udev/rules.d/70-persistent-net.rules
+
 dd if=/dev/zero of=/zero bs=1MiB
 rm /zero
 

@@ -16,10 +16,8 @@ config.vm.provision "shell", inline: <<-SHELL
   create-partition "/dev/sdc"
   mount-partition "DOCKER", "/dev/sdc1" "/var/lib/docker"
   provide 10config
-  provide 20initialize
   provide 21upgrade
   provide 22base-packages
-  provide 30tools
   provide 31docker #{USERNAME}
   provide 31samba '192.168.33.'
   provide 41samba-export #{USERNAME} ~#{USERNAME} #{USERNAME}

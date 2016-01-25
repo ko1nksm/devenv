@@ -1,13 +1,13 @@
 #!/bin/sh
 
-GIT_VERSION=2.6.4
+set -e
+
+GIT_VERSION=2.7.0
 TIG_VERSION=tig-2.1.1
 
 MAX_JOBS=$(($(nproc) * 2))
 
-# git
-apt-get install -y libcurl4-openssl-dev libexpat1-dev tk8.5
-
+# https://github.com/git/git/releases
 if [ ! -e /usr/local/src/git-${GIT_VERSION} ]; then
   curl -sSL https://www.kernel.org/pub/software/scm/git/git-${GIT_VERSION}.tar.gz | tar zx -C /usr/local/src
 fi
@@ -25,9 +25,7 @@ find /usr/local/libexec -type d -exec chmod u=rwx,g=rwxs,o=rx {} \;
 chown -R root:staff /usr/local/share/git-core
 
 
-# tig
-apt-get install -y libncurses5-dev libncursesw5-dev
-
+# https://github.com/jonas/tig/releases
 TIG_DIR=/usr/local/src/tig
 if [ ! -e $TIG_DIR ]; then
   git clone https://github.com/jonas/tig.git $TIG_DIR
