@@ -37,26 +37,11 @@ Vagrant.configure(2) do |config|
     Pin-Priority: 995
   HERE
 
-  cleanup = <<-'HERE'.gsub(/^ +/, '')
-    echo '\033[1;33mCleanup\033[0;39m'
-    echo -n '\033[0;33m'
-    old_kernels=\$(dpkg -l | egrep 'linux-(image|headers)-[0-9]' | grep -v \$(uname -r | sed s/-amd64//) | awk '{print \$2}')
-    if [ x\$old_kernels != x ]; then
-      apt-get -y purge \$old_kernels
-      apt-get -y autoremove
-      apt-get clean
-    fi
-    dd if=/dev/zero of=zero bs=1MiB
-    rm zero
-    echo -n '\033[0;39m'
-  HERE
-
   config.vm.provision "shell", inline: <<-SHELL
     set -e
     export DEBIAN_FRONTEND=noninteractive
     echo "#{sources_list}" > /etc/apt/sources.list
     echo "#{preferences}" > /etc/apt/preferences
-    echo "#{cleanup}" > /cleanup
     apt-get -y update
     apt-get -y upgrade
     apt-get -y dist-upgrade

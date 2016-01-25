@@ -185,7 +185,7 @@ build() {
     vagrant up --provision
     [ "$debug" ] && continue
     vagrant reload
-    vagrant ssh -c "sudo sh /cleanup"
+    vagrant ssh -c "sudo sh /vagrant/cleanup.sh"
     vagrant halt
     vagrant package
     if [ -f package.box ]; then
