@@ -122,11 +122,11 @@ upgrade_vm() {
     running)
       vagrant provision "$vm"
       ;;
-    poweroff)
+    poweroff | aborted)
       vagrant up "$vm" --provision
       vagrant halt "$vm"
       ;;
-    not-created | aborted) ;; # skip
+    not-created) ;; # skip
     *) abort "Unsupport status '$status'"
   esac
 }
