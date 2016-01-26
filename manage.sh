@@ -56,7 +56,7 @@ info() {
 vagrant_status() {
   local vm="$1" status
 
-  status=$(vagrant status "$vm" | grep "^$vm ")
+  status=$(vagrant status "$vm" | grep ")$" | grep "^$vm ")
   status=${status#$vm}
   status=${status% *}
   echo $status | sed 's/ /-/'
