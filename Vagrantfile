@@ -5,6 +5,14 @@ require_relative 'vagrant-dev/vagrant-dev'
 
 STORAGE_DIR = ENV['HOME'] unless defined? STORAGE_DIR
 
+NETWORK = '192.168.33'
+IPADDR_LIST = {
+  'test'    => '192.168.33.9',
+  'default' => '192.168.33.10',
+  'docker'  => '192.168.33.11',
+  'dns'     => '192.168.33.12',
+}
+
 Vagrant.configure(2) do |config|
   config.vm.box = "debian/jessie64"
   # config.vm.box_version
@@ -54,6 +62,7 @@ Vagrant.configure(2) do |config|
     SHELL
 
     dev.enumerate_vms(File.dirname(__FILE__)) do |name, config, include_vm|
+      config.vm.network "private_network", ip: IPADDR_LIST[name]
       config.vm.hostname = name + '.local'
       config.vm.provider :virtualbox do |vb|
         vb.name = name + '.local'

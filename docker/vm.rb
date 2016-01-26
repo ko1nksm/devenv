@@ -1,5 +1,3 @@
-config.vm.network "private_network", ip: '192.168.33.11'
-
 config.vm.provider :virtualbox do |vb|
   vb.attach_storage "docker-data.vdi", **{
     storagectl: 'IDE Controller',
@@ -20,7 +18,7 @@ config.vm.provision "shell", inline: <<-SHELL
   provide upgrade
   provide packages
   provide docker-tools #{USERNAME}
-  provide samba '192.168.33.'
+  provide samba #{NETWORK}
   provide samba-export #{USERNAME} ~#{USERNAME} #{USERNAME}
   #{COMPLETE()}
 SHELL
