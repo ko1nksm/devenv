@@ -20,7 +20,9 @@ Usage: manage.sh build [OPTION]... [BOX]...
 
   OPTION:
     -a, --all       build all boxes
-    -d, --debug     keep VM for debug
+    -i, --install   install box
+    -k, --keep      do not delete package.box after installed
+    -d, --debug     keep VM for debugging.
 
 Usage: manage.sh create [OPTION]... [VM]...
   Create VM(s)
@@ -201,11 +203,14 @@ list_boxes() {
 }
 
 do_build() {
-  local box workdir size debug="" boxes=$@
+  local box workdir install="" keep="" fetch="" debug="" size boxes
+  boxes=$@
 
   for param in "$@"; do
     case $param in
       -a | --all) boxes=$(list_boxes) ;;
+      -i | --install) install=1 ;;
+      -k | --keep) keep=1 ;;
       -d | --debug) debug=1 ;;
       -*) abort "Unknown option $param"
     esac
@@ -218,11 +223,12 @@ do_build() {
     cd "$workdir"
     [ -f package.box ] && abort "$workdir/package.box already exists."
 
+    unset LATEST_BOX_VERSION
     if vagrant box list | grep "$box (virtualbox, 0)" >/dev/null; then
-      info "Found latest box"
+      info "Build from latest box using as cache"
+      info "To remove latest box, run below"
+      info "vagrant box remove \"$box\" --box-version 0 --provider virtualbox"
       export LATEST_BOX_VERSION=0
-    else
-      unset LATEST_BOX_VERSION
     fi
 
     vagrant halt
@@ -235,8 +241,13 @@ do_build() {
     [ -f package.box ] || abort "Not found package.box"
     size=$(wc -c < package.box)
     info "Generated package.box [$(expr $size / 1024 / 1024) MB]"
-    vagrant box add package.box --name "$box" --force
-    rm package.box
+    if [ "$install" ]; then
+      vagrant box add package.box --name "$box" --force
+      [ "$keep" ] || rm package.box
+    else
+      info "To install box, run below"
+      info "vagrant box add \"$workdir/package.box\" --name \"$box\" --force"
+    fi
     vagrant destroy --force
   done
 }
@@ -258,7 +269,8 @@ list_vms() {
 }
 
 do_create() {
-  local param vms=$@ vmid
+  local param vms vmid
+  vms=$@
 
   for param in "$@"; do
     case $param in
@@ -274,7 +286,8 @@ do_create() {
 }
 
 do_upgrade() {
-  local param recreate="" vms=$@ vmid
+  local param recreate="" vms vmid
+  vms=$@
 
   for param in "$@"; do
     case $param in
@@ -297,7 +310,8 @@ do_upgrade() {
 }
 
 do_remove() {
-  local param vms=$@ vmid
+  local param vms vmid
+  vms=$@
 
   for param in "$@"; do
     case $param in
