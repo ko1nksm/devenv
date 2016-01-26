@@ -47,7 +47,7 @@ Vagrant.configure(2) do |config|
       mount-partition "HOME" "/dev/sdb1" "/home/#{USERNAME}" "#{USERNAME}"
       insert-authorized-keys "#{USERNAME}" "#{READ KEY_FILE}"
       create-setup "#{USERNAME}" '#{SETUP}'
-      #{COMPLETE}
+      #{COMPLETE()}
     SHELL
 
     dev.enumerate_vms(File.dirname(__FILE__)) do |name, config, include_vm|

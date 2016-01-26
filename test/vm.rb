@@ -7,5 +7,5 @@ config.vm.provision "shell", inline: <<-SHELL
   provide packages
   provide samba '192.168.33.'
   provide samba-export #{USERNAME} ~#{USERNAME} #{USERNAME}
-  #{COMPLETE}
+  #{COMPLETE()}
 SHELL

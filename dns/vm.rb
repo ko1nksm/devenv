@@ -8,5 +8,5 @@ config.vm.provision "shell", inline: <<-SHELL
   provide docker-tools #{USERNAME}
   provide samba '192.168.33.'
   provide samba-export #{USERNAME} ~#{USERNAME} #{USERNAME}
-  #{COMPLETE}
+  #{COMPLETE()}
 SHELL
