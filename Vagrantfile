@@ -42,6 +42,7 @@ Vagrant.configure(2) do |config|
   VagrantDev.install(config) do |dev|
     config.vm.provision "shell", inline: <<-SHELL
       #{BOOTSTRAP()}
+      load config
       create-partition "/dev/sdb"
       create-user "#{USERNAME}" "#{USERNAME}" /bin/zsh
       mount-partition "HOME" "/dev/sdb1" "/home/#{USERNAME}" "#{USERNAME}"

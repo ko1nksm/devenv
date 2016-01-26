@@ -13,6 +13,7 @@ end
 
 config.vm.provision "shell", inline: <<-SHELL
   #{BOOTSTRAP(vmname)}
+  load config
   create-partition "/dev/sdc"
   mount-partition "DOCKER", "/dev/sdc1" "/var/lib/docker"
   provide system
