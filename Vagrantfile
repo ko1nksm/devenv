@@ -57,9 +57,6 @@ Vagrant.configure(2) do |config|
       config.vm.hostname = name + '.local'
       config.vm.provider :virtualbox do |vb|
         vb.name = name + '.local'
-        vb.description <<-HERE.gsub(/^\s+/, '')
-          HOST: #{name}.local
-        HERE
         vb.attach_storage "#{name}-home.vdi", **{
           storagectl: 'IDE Controller',
           port: 0,
