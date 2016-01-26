@@ -1,5 +1,9 @@
 #!/bin/sh
 
+# Copyright (c) 2016 Koichi Nakashima
+# Released under the MIT license
+# http://opensource.org/licenses/mit-license.php
+
 set -eu
 
 BASEDIR="$(dirname $0)"
