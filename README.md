@@ -60,3 +60,29 @@ Base Boxからの再構築による更新でも、システムストレージ以
 ### シェルスクリプトベースのプロビジョニング
 
 シェルベースでプロビジョニングコードを記述しやすくするための簡易関数が使用できます。
+
+## 使用方法
+
+Base Boxのビルド (更新)
+
+```
+./manage.sh build debian/jessie64
+```
+
+各開発環境VMの起動
+
+```
+vagrant up default
+```
+
+各開発環境VMの更新
+
+```
+./manage.sh upgrade default
+```
+
+各開発環境VMの再構築
+
+```
+./manage.sh upgrade default -r
+```
