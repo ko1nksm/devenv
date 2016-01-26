@@ -62,6 +62,10 @@ vagrant_status() {
   echo $status | sed 's/ /-/'
 }
 
+vagrant_status_list() {
+  vagrant status | grep ")$"
+}
+
 vagrant_vmid() {
   local vm="$1" id_file=".vagrant/machines/$vm/virtualbox/id"
 
@@ -197,26 +201,18 @@ list_boxes() {
 }
 
 do_build() {
-  local box workdir size all="" debug="" boxes
-
-  if [ $# -eq 0 ]; then
-    info "Box name(s) must be specified from list below or specify --all option"
-    list_boxes
-    exit
-  fi
+  local box workdir size debug="" boxes=$@
 
   for param in "$@"; do
     case $param in
-      -a | --all) all=1 ;;
+      -a | --all) boxes=$(list_boxes) ;;
       -d | --debug) debug=1 ;;
       -*) abort "Unknown option $param"
     esac
   done
 
-  [ "$all" ] && boxes=$(list_boxes) || boxes=$@
   for box in $boxes; do
     case $box in -*) continue; esac
-
     workdir="$BOXESDIR/$box"
     [ -d "$workdir" ] || abort "Not found box directory"
     cd "$workdir"
@@ -245,6 +241,12 @@ do_build() {
   done
 }
 
+list_defined_vms() {
+  vagrant_status_list | while IFS= read line; do
+    echo ${line%% *}
+  done
+}
+
 list_vms() {
   local dir vm
   for dir in "$BASEDIR/.vagrant/machines/"*; do
@@ -255,27 +257,35 @@ list_vms() {
   done
 }
 
-do_upgrade() {
-  local param recreate="" all="" vms vmid
-
-  if [ $# -eq 0 ]; then
-    info "VM name(s) must be specified from list below or specify --all option"
-    list_vms
-    exit
-  fi
+do_create() {
+  local param vms=$@ vmid
 
   for param in "$@"; do
     case $param in
-      -r | --recreate) recreate=1 ;;
-      -a | --all) all=1 ;;
+      -a | --all) vms=$(list_defined_vms) ;;
       -*) abort "Unknown option $param"
     esac
   done
 
-  [ "$all" ] && vms=$(list_vms) || vms=$@
   for vm in $vms; do
     case $vm in -*) continue; esac
+    create_vm "$vm"
+  done
+}
 
+do_upgrade() {
+  local param recreate="" vms=$@ vmid
+
+  for param in "$@"; do
+    case $param in
+      -a | --all) vms=$(list_vms) ;;
+      -r | --recreate) recreate=1 ;;
+      -*) abort "Unknown option $param"
+    esac
+  done
+
+  for vm in $vms; do
+    case $vm in -*) continue; esac
     vmid=$(vagrant_vmid "$vm")
     [ "$vmid" ] || abort "Specified VM '$vm' is not created by vagrant"
     if [ $recreate ]; then
@@ -286,50 +296,18 @@ do_upgrade() {
   done
 }
 
-do_create() {
-  local param recreate="" all="" vms vmid
-
-  if [ $# -eq 0 ]; then
-    info "VM name(s) must be specified from list below or specify --all option"
-    list_vms
-    exit
-  fi
-
-  for param in "$@"; do
-    case $param in
-      -a | --all) all=1 ;;
-      -*) abort "Unknown option $param"
-    esac
-  done
-
-  [ "$all" ] && vms=$(list_vms) || vms=$@
-  for vm in $vms; do
-    case $vm in -*) continue; esac
-
-    create_vm "$vm"
-  done
-}
-
 do_remove() {
-  local param recreate="" all="" vms vmid
-
-  if [ $# -eq 0 ]; then
-    info "VM name(s) must be specified from list below or specify --all option"
-    list_vms
-    exit
-  fi
+  local param vms=$@ vmid
 
   for param in "$@"; do
     case $param in
-      -a | --all) all=1 ;;
+      -a | --all) vms=$(list_vms) ;;
       -*) abort "Unknown option $param"
     esac
   done
 
-  [ "$all" ] && vms=$(list_vms) || vms=$@
   for vm in $vms; do
     case $vm in -*) continue; esac
-
     vmid=$(vagrant_vmid "$vm")
     [ "$vmid" ] || abort "Specified VM '$vm' is not created by vagrant"
     remove_vm "$vm"
@@ -345,9 +323,21 @@ done
 
 cd "$BASEDIR"
 case $1 in
-  build) do_$@ ;;
-  upgrade) do_$@ ;;
-  create) do_$@ ;;
-  remove) do_$@ ;;
+  build)
+    if [ $# -eq 1 ]; then
+      info "Box name(s) must be specified from list below or specify --all option"
+      list_boxes
+      exit
+    fi
+    do_$@
+    ;;
+  create | upgrade | remove)
+    if [ $# -eq 1 ]; then
+      info "VM name(s) must be specified from list below or specify --all option"
+      list_vms
+      exit
+    fi
+    do_$@
+    ;;
   *) abort "Unknown command '$1'"
 esac
