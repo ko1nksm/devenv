@@ -166,7 +166,16 @@ remove_vm() {
   esac
 }
 
-build() {
+list_boxes() {
+  cd "$BOXESDIR"
+  find . -name Vagrantfile | while IFS= read name; do
+    name=$(echo "${name#./}")
+    name=$(echo "${name%/Vagrantfile}")
+    echo "$name"
+  done
+}
+
+do_build() {
   local box workdir size all="" debug="" boxes
 
   if [ $# -eq 0 ]; then
@@ -215,16 +224,17 @@ build() {
   done
 }
 
-list_boxes() {
-  cd "$BOXESDIR"
-  find . -name Vagrantfile | while IFS= read name; do
-    name=$(echo "${name#./}")
-    name=$(echo "${name%/Vagrantfile}")
-    echo "$name"
+list_vms() {
+  local dir vm
+  for dir in "$BASEDIR/.vagrant/machines/"*; do
+    vm=${dir##*/}
+    if [ $(vagrant_vmid $vm) ]; then
+      echo "$vm"
+    fi
   done
 }
 
-upgrade() {
+do_upgrade() {
   local param recreate="" all="" vms vmid
 
   if [ $# -eq 0 ]; then
@@ -255,7 +265,7 @@ upgrade() {
   done
 }
 
-remove() {
+do_remove() {
   local param recreate="" all="" vms vmid
 
   if [ $# -eq 0 ]; then
@@ -281,16 +291,6 @@ remove() {
   done
 }
 
-list_vms() {
-  local dir vm
-  for dir in "$BASEDIR/.vagrant/machines/"*; do
-    vm=${dir##*/}
-    if [ $(vagrant_vmid $vm) ]; then
-      echo "$vm"
-    fi
-  done
-}
-
 [ $# -eq 0 ] && usage
 for param in "$@"; do
   case $param in
@@ -300,8 +300,8 @@ done
 
 cd "$BASEDIR"
 case $1 in
-  build) $@ ;;
-  upgrade) $@ ;;
-  remove) $@ ;;
+  build) do_$@ ;;
+  upgrade) do_$@ ;;
+  remove) do_$@ ;;
   *) abort "Unknown command '$1'"
 esac
