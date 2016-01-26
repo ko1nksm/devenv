@@ -81,3 +81,9 @@ vagrant up default
 ```
 ./manage.sh upgrade default -r
 ```
+
+## ライセンス
+
+* manage.sh は MIT License です。
+* vagrant-dev(別リポジトリ)部分は vagrant-devのライセンス(MIT License)に準じます。
+* その他のファイルはパブリックドメイン扱いです。
