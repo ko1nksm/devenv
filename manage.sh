@@ -19,14 +19,21 @@ Usage: manage.sh build [OPTION]... [BOX]...
   Build box(es)
 
   OPTION:
-    -a, --all       build all box
-    -d, --debug     keep vm for debug
+    -a, --all       build all boxes
+    -d, --debug     keep VM for debug
 
 Usage: manage.sh upgrade [OPTION]... [VM]...
-  Upgrade vm(s)
+  Upgrade VM(s)
 
   OPTION:
-    -r, --recreate  destroy vm and recreate
+    -a, --all       upgrade all VMs
+    -r, --recreate  destroy VM and recreate
+
+Usage: manage.sh remove [OPTION]... [VM]...
+  Remove VM(s)
+
+  OPTION:
+    -a, --all       remove all VMs
 TEXT
 exit
 }
@@ -138,6 +145,27 @@ recreate_vm() {
   esac
 }
 
+remove_vm() {
+  local vm="$1" status
+
+  status=$(vagrant_status "$vm")
+
+  echo "Remove $vm ($status)"
+  case $status in
+    running)
+      vagrant halt "$vm"
+      detach_storage "$vm"
+      vagrant destroy -f "$vm"
+      ;;
+    poweroff | aborted)
+      detach_storage "$vm"
+      vagrant destroy -f "$vm"
+      ;;
+    not-created) ;; # skip
+    *) abort "Unsupport status '$status'"
+  esac
+}
+
 build() {
   local box workdir size all="" debug="" boxes
 
@@ -227,6 +255,32 @@ upgrade() {
   done
 }
 
+remove() {
+  local param recreate="" all="" vms vmid
+
+  if [ $# -eq 0 ]; then
+    info "VM name(s) must be specified from list below or specify --all option"
+    list_vms
+    exit
+  fi
+
+  for param in "$@"; do
+    case $param in
+      -a | --all) all=1 ;;
+      -*) abort "Unknown option $param"
+    esac
+  done
+
+  [ "$all" ] && vms=$(list_vms) || vms=$@
+  for vm in $vms; do
+    case $vm in -*) continue; esac
+
+    vmid=$(vagrant_vmid "$vm")
+    [ "$vmid" ] || abort "Specified VM '$vm' is not created by vagrant"
+    remove_vm "$vm"
+  done
+}
+
 list_vms() {
   local dir vm
   for dir in "$BASEDIR/.vagrant/machines/"*; do
@@ -248,5 +302,6 @@ cd "$BASEDIR"
 case $1 in
   build) $@ ;;
   upgrade) $@ ;;
+  remove) $@ ;;
   *) abort "Unknown command '$1'"
 esac
