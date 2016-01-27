@@ -6,5 +6,5 @@ cat <<DATA > /etc/apt/sources.list.d/docker.list
 deb https://apt.dockerproject.org/repo debian-jessie main
 DATA
 
-apt-get update
-apt-get install docker-engine
+apt-get -y update
+apt-get -y install docker-engine
