@@ -58,12 +58,12 @@ Vagrant.configure(2) do |config|
       #{COMPLETE()}
     SHELL
 
-    dev.enumerate_vms(File.dirname(__FILE__)) do |name, config, include_vm|
-      config.vm.network "private_network", ip: IPADDR_LIST[name]
-      config.vm.hostname = name + '.local'
+    dev.vms(File.dirname(__FILE__)) do |vm, config|
+      config.vm.network "private_network", ip: IPADDR_LIST[vm.name]
+      config.vm.hostname = vm.name + '.local'
       config.vm.provider :virtualbox do |vb|
-        vb.name = name + '.local'
-        vb.attach_storage "#{name}-home.vdi", **{
+        vb.name = vm.name + '.local'
+        vb.attach_storage "#{vm.name}-home.vdi", **{
           storagectl: 'IDE Controller',
           port: 0,
           device: 1,
@@ -72,7 +72,7 @@ Vagrant.configure(2) do |config|
           basedir: STORAGE_DIR,
         }
       end
-      include_vm.call
+      vm.load
     end
   end
 

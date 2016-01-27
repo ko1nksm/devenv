@@ -10,7 +10,7 @@ config.vm.provider :virtualbox do |vb|
 end
 
 config.vm.provision "shell", inline: <<-SHELL
-  #{BOOTSTRAP(vmname)}
+  #{BOOTSTRAP(name)}
   load config
   create-partition "/dev/sdc"
   mount-partition "DOCKER", "/dev/sdc1" "/var/lib/docker"

@@ -1,5 +1,5 @@
 config.vm.provision "shell", inline: <<-SHELL
-  #{BOOTSTRAP(vmname)}
+  #{BOOTSTRAP(name)}
   load config
   provide system
   provide upgrade
