@@ -231,22 +231,24 @@ do_build() {
       export LATEST_BOX_VERSION=0
     fi
 
+    package="$(echo "$box" | tr "/" "-")-$(date "+%Y.%m.%d.%H%M").box"
     vagrant halt
     vagrant up --provision
     [ "$debug" ] && continue
     vagrant reload # reboot for new kernel
     vagrant ssh -c "sudo sh /vagrant/cleanup.sh"
     vagrant halt
-    vagrant package
-    [ -f package.box ] || abort "Not found package.box"
-    size=$(wc -c < package.box)
-    info "Generated package.box [$(expr $size / 1024 / 1024) MB]"
+    vagrant package --output "$package"
+    [ -f "$package" ] || abort "Not found $package"
+    mv "$package" "$BASEDIR/"
+    size=$(wc -c < "$BASEDIR/$package")
+    info "Generated $package [$(expr $size / 1024 / 1024) MB]"
     if [ "$install" ]; then
-      vagrant box add package.box --name "$box" --force
-      [ "$keep" ] || rm package.box
+      vagrant box add "$BASEDIR/$package" --name "$box" --force
+      [ "$keep" ] || rm "$BASEDIR/$package"
     else
       info "To install box, run below"
-      info "vagrant box add \"$workdir/package.box\" --name \"$box\" --force"
+      info "vagrant box add \"$package\" --name \"$box\" --force"
     fi
     vagrant destroy --force
   done
