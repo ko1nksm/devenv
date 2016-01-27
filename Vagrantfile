@@ -14,10 +14,7 @@ IPADDR_LIST = {
 }
 
 Vagrant.configure(2) do |config|
-  config.vm.box = "debian/jessie64"
-  # config.vm.box_version
-  #   0 means the latest box version that has been built with local.
-  config.vm.box_version = "0"
+  config.vm.box = "debian/jessie64@latest"
   config.vm.box_check_update = false
 
   config.vm.define 'default', primary: true

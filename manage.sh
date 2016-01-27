@@ -203,7 +203,7 @@ list_boxes() {
 }
 
 do_build() {
-  local box workdir install="" keep="" fetch="" debug="" size boxes
+  local box install="" keep="" debug="" size boxes package
   boxes=$@
 
   for param in "$@"; do
@@ -218,17 +218,16 @@ do_build() {
 
   for box in $boxes; do
     case $box in -*) continue; esac
-    workdir="$BOXESDIR/$box"
-    [ -d "$workdir" ] || abort "Not found box directory"
-    cd "$workdir"
-    [ -f package.box ] && abort "$workdir/package.box already exists."
+    [ -d "$BOXESDIR/$box" ] || abort "Not found box directory"
+    cd "$BOXESDIR/$box"
 
-    unset LATEST_BOX_VERSION
-    if vagrant box list | grep "$box (virtualbox, 0)" >/dev/null; then
+    if vagrant box list | grep "$box@latest " >/dev/null; then
       info "Build from latest box using as cache"
       info "To remove latest box, run below"
-      info "vagrant box remove \"$box\" --box-version 0 --provider virtualbox"
-      export LATEST_BOX_VERSION=0
+      info "vagrant box remove \"$box@latest\" --provider virtualbox"
+      export LATEST_BOX_SUFFIX="@latest"
+    else
+      unset LATEST_BOX_SUFFIX
     fi
 
     package="$(echo "$box" | tr "/" "-")-$(date "+%Y.%m.%d.%H%M").box"
@@ -240,17 +239,19 @@ do_build() {
     vagrant halt
     vagrant package --output "$package"
     [ -f "$package" ] || abort "Not found $package"
-    mv "$package" "$BASEDIR/"
-    size=$(wc -c < "$BASEDIR/$package")
+    size=$(wc -c < "$package")
     info "Generated $package [$(expr $size / 1024 / 1024) MB]"
+    vagrant destroy --force
+
+    cd "$BASEDIR"
+    mv "$BOXESDIR/$box/$package" "$BASEDIR/"
     if [ "$install" ]; then
-      vagrant box add "$BASEDIR/$package" --name "$box" --force
-      [ "$keep" ] || rm "$BASEDIR/$package"
+      vagrant box add "$package" --name "$box@latest" --force
+      [ "$keep" ] || rm "$package"
     else
       info "To install box, run below"
-      info "vagrant box add \"$package\" --name \"$box\" --force"
+      info "vagrant box add \"$package\" --name \"$box@latest\" --force"
     fi
-    vagrant destroy --force
   done
 }
 
