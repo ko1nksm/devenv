@@ -4,7 +4,7 @@ config.vm.provision "shell", inline: <<-SHELL
   provide system
   provide upgrade
   provide packages
-  provide samba #{NETWORK}
+  provide samba #{$NETWORK}
   provide samba-export #{USERNAME} ~#{USERNAME} #{USERNAME}
   #{COMPLETE()}
 SHELL

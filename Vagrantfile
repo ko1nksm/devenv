@@ -3,10 +3,9 @@
 
 require_relative 'vagrant-dev/vagrant-dev'
 
-STORAGE_DIR = ENV['HOME'] unless defined? STORAGE_DIR
-
-NETWORK = '192.168.33'
-IPADDR_LIST = {
+$STORAGE_DIR = ENV['HOME']
+$NETWORK = '192.168.33'
+$IPADDR_LIST = {
   'test'    => '192.168.33.9',
   'default' => '192.168.33.10',
   'docker'  => '192.168.33.11',
@@ -59,7 +58,7 @@ Vagrant.configure(2) do |config|
     SHELL
 
     dev.vms(File.dirname(__FILE__)) do |vm, config|
-      config.vm.network "private_network", ip: IPADDR_LIST[vm.name]
+      config.vm.network "private_network", ip: $IPADDR_LIST[vm.name]
       config.vm.hostname = vm.name + '.local'
       config.vm.provider :virtualbox do |vb|
         vb.name = vm.name + '.local'
@@ -69,7 +68,7 @@ Vagrant.configure(2) do |config|
           device: 1,
           type: 'hdd',
           size: 10240,
-          basedir: STORAGE_DIR,
+          basedir: $STORAGE_DIR,
         }
       end
       vm.load

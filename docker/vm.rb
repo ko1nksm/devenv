@@ -5,7 +5,7 @@ config.vm.provider :virtualbox do |vb|
     device: 0,
     type: 'hdd',
     size: 10240,
-    basedir: STORAGE_DIR,
+    basedir: $STORAGE_DIR,
   }
 end
 
@@ -18,7 +18,7 @@ config.vm.provision "shell", inline: <<-SHELL
   provide upgrade
   provide packages
   provide docker-tools #{USERNAME}
-  provide samba #{NETWORK}
+  provide samba #{$NETWORK}
   provide samba-export #{USERNAME} ~#{USERNAME} #{USERNAME}
   #{COMPLETE()}
 SHELL
