@@ -4,7 +4,7 @@
 require_relative 'vagrant-dev/vagrant-dev'
 
 $STORAGE_DIR = ENV['HOME']
-$NETWORK = '192.168.33'
+$NETWORK = '192.168.33.'
 $IPADDR_LIST = {
   'test'    => '192.168.33.9',
   'default' => '192.168.33.10',
