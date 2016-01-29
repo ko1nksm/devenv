@@ -19,6 +19,7 @@ ExecStop=/usr/bin/docker stop -t 2 devdns ; /usr/bin/docker rm -f devdns
 WantedBy=multi-user.target
 DATA
 
+docker pull ko1nksm/devdns
 systemctl daemon-reload
 service devdns start
 systemctl enable devdns.service
