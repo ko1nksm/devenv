@@ -1,0 +1,24 @@
+#!/bin/sh
+
+IPADDR=$1
+shift
+
+OPT="-e IPADDR=$IPADDR -v /var/cache/bind:/var/cache/bind"
+
+cat <<DATA > /etc/systemd/system/devdns.service
+[Unit]
+Description=devdns
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/docker run --name devdns -p 53:53 -p 53:53/udp $OPT ko1nksm/devdns $@
+ExecStop=/usr/bin/docker stop -t 2 devdns ; /usr/bin/docker rm -f devdns
+[Install]
+WantedBy=multi-user.target
+DATA
+
+systemctl daemon-reload
+service devdns start
+systemctl enable devdns.service
