@@ -36,6 +36,7 @@ Usage: manage.sh upgrade [OPTION]... [VM]...
   OPTION:
     -a, --all       upgrade all VMs
     -r, --recreate  destroy VM and recreate
+    -f, --force     force recreate VM
 
 Usage: manage.sh remove [OPTION]... [VM]...
   Remove VM(s)
@@ -53,6 +54,17 @@ abort() {
 
 info() {
   printf "\033[1;33m%s\033[0;39m\n" "$1"
+}
+
+yesno() {
+  while true; do
+    printf "%s [y/N] " "$1"
+    read ans
+    case $(echo $ans | tr "[:upper:]" "[:lower:]") in
+      y | yes) return 0 ;;
+      n | no) return 1 ;;
+    esac
+  done
 }
 
 vagrant_status() {
@@ -289,16 +301,21 @@ do_create() {
 }
 
 do_upgrade() {
-  local param recreate="" vms vmid
+  local param recreate="" force="" vms vmid
   vms=$@
 
   for param in "$@"; do
     case $param in
       -a | --all) vms=$(list_vms) ;;
       -r | --recreate) recreate=1 ;;
+      -f | --force) force=1 ;;
       -*) abort "Unknown option $param"
     esac
   done
+
+  if [ "$recreate" -a ! "$force" ]; then
+    yesno "Are you sure you want to recreate VM?" || exit 1
+  fi
 
   for vm in $vms; do
     case $vm in -*) continue; esac
