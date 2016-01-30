@@ -9,3 +9,12 @@ GRUB_CMDLINE_LINUX="debian-installer=en_US"
 DATA
 
 update-grub
+
+cat <<DATA > /etc/apt/apt.conf.d/local
+Acquire {
+    Retries "5";
+};
+Dpkg::Options {
+   "--force-confold";
+};
+DATA
