@@ -9,7 +9,6 @@ config.vm.provision "shell", inline: <<-SHELL
   provide system
   provide upgrade
   provide packages
-  provide docker-tools #{USERNAME}
   provide samba #{$NETWORK}
   provide devdns #{$IPADDR_LIST[name]} --zone local --zone dev
   provide samba-export #{USERNAME} ~#{USERNAME} #{USERNAME}
