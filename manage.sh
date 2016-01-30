@@ -43,6 +43,7 @@ Usage: manage.sh remove [OPTION]... [VM]...
 
   OPTION:
     -a, --all       remove all VMs
+    -f, --force     force remove VM
 TEXT
 exit
 }
@@ -330,15 +331,20 @@ do_upgrade() {
 }
 
 do_remove() {
-  local param vms vmid
+  local param vms force="" vmid
   vms=$@
 
   for param in "$@"; do
     case $param in
       -a | --all) vms=$(list_vms) ;;
+      -f | --force) force=1 ;;
       -*) abort "Unknown option $param"
     esac
   done
+
+  if [ ! "$force" ]; then
+    yesno "Are you sure you want to remove VM?" || exit 1
+  fi
 
   for vm in $vms; do
     case $vm in -*) continue; esac
