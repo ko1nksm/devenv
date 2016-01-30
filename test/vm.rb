@@ -1,7 +1,7 @@
 config.vm.provision "shell", inline: <<-SHELL
   #{BOOTSTRAP(name)}
   load config
-  provide system
+  provide system #{USERNAME}
   provide upgrade
   provide packages
   provide samba #{$NETWORK}

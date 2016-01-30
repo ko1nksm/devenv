@@ -14,10 +14,10 @@ config.vm.provision "shell", inline: <<-SHELL
   load config
   create-partition "/dev/sdc"
   mount-partition "DOCKER", "/dev/sdc1" "/var/lib/docker"
-  provide system
+  provide system #{USERNAME}
   provide upgrade
   provide packages
-  provide docker-tools #{USERNAME}
+  provide docker-tools
   provide samba #{$NETWORK}
   provide samba-export #{USERNAME} ~#{USERNAME} #{USERNAME}
   #{COMPLETE()}
