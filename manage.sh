@@ -29,6 +29,7 @@ Usage: manage.sh create [OPTION]... [VM]...
 
   OPTION:
     -a, --all       create all VMs
+    -k, --keep      keep the running state
 
 Usage: manage.sh upgrade [OPTION]... [VM]...
   Upgrade VM(s)
@@ -171,17 +172,21 @@ recreate_vm() {
 }
 
 create_vm() {
-  local vm="$1" status
+  local vm="$1" keep="$2" status
 
   status=$(vagrant_status "$vm")
 
-  echo "Create $vm (current status: $status)"
   case $status in
     not-created)
+      echo "Create $vm (current status: $status)"
       vagrant up "$vm" --provision
-      vagrant halt "$vm"
+      if [ ! "$keep" ]; then
+        vagrant halt "$vm"
+      fi
       ;;
-    *) ;; # skip
+    *)
+      echo "Skip the creation of $vm (current status: $status)"
+      ;;
   esac
 }
 
@@ -285,19 +290,20 @@ list_vms() {
 }
 
 do_create() {
-  local param vms vmid
+  local param vms keep="" vmid
   vms=$@
 
   for param in "$@"; do
     case $param in
       -a | --all) vms=$(list_defined_vms) ;;
+      -k | --keep) keep=1 ;;
       -*) abort "Unknown option $param"
     esac
   done
 
   for vm in $vms; do
     case $vm in -*) continue; esac
-    create_vm "$vm"
+    create_vm "$vm" "$keep"
   done
 }
 
