@@ -13,6 +13,7 @@ After=docker.service
 
 [Service]
 Type=simple
+Restart=always
 ExecStart=/usr/bin/docker run --name devdns -p 53:53 -p 53:53/udp $OPT ko1nksm/devdns $@
 ExecStop=/usr/bin/docker stop -t 2 devdns ; /usr/bin/docker rm -f devdns
 [Install]
