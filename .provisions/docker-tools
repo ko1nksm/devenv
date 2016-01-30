@@ -1,14 +1,16 @@
 #!/bin/sh
 
 COMPOSE_VERSION=1.5.2
-MACHINE_VERSION=v0.5.4
+MACHINE_VERSION=v0.5.6
 
+# https://github.com/docker/compose/releases/
 COMPOSE_URL=https://github.com/docker/compose/releases/download/$COMPOSE_VERSION/docker-compose-`uname -s`-`uname -m`
 COMPOSE_PATH=/usr/local/bin/docker-compose
 curl -sSL $COMPOSE_URL > $COMPOSE_PATH
 chmod +x $COMPOSE_PATH
 
-MACHINE_URL=https://github.com/docker/machine/releases/download/v0.5.4/docker-machine_linux-amd64
+# https://github.com/docker/machine/releases
+MACHINE_URL=https://github.com/docker/machine/releases/download/$MACHINE_VERSION/docker-machine_linux-amd64
 MACHINE_PATH=/usr/local/bin/docker-machine
 curl -sSL $MACHINE_URL > $MACHINE_PATH
 chmod +x $MACHINE_PATH
