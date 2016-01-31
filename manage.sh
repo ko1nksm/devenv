@@ -256,8 +256,10 @@ do_build() {
     package="$(echo "$box" | tr "/" "-")@$(date "+%Y.%m.%d.%H%M").box"
     vagrant halt
     vagrant up $option
-    vagrant reload $option # reboot for new kernel
-    vagrant ssh -c "sudo sh /vagrant/cleanup.sh"
+    if vagrant ssh -c "sh -c '[ -f /vagrant/cleanup.sh ]'"; then
+      vagrant reload $option # reboot for new kernel
+      vagrant ssh -c "sudo sh /vagrant/cleanup.sh"
+    fi
 
     if [ "$debug" ]; then
       vagrant ssh ||:
