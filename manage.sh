@@ -251,12 +251,12 @@ do_build() {
       fi
     fi
 
-    package="$(echo "$box" | tr "/" "-")-$(date "+%Y.%m.%d.%H%M").box"
+    package="$(echo "$box" | tr "/" "-")@$(date "+%Y.%m.%d.%H%M").box"
     vagrant halt
     vagrant up --provision
-    [ "$debug" ] && continue
     vagrant reload # reboot for new kernel
     vagrant ssh -c "sudo sh /vagrant/cleanup.sh"
+    [ "$debug" ] && continue
     vagrant halt
     vagrant package --output "$package"
     [ -f "$package" ] || abort "Not found $package"
