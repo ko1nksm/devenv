@@ -23,7 +23,7 @@ Usage: manage.sh build [OPTION]... [BOX]...
     -i, --install   install box
     -k, --keep      do not delete package.box after installed
     -n, --no-cache  do not use cache
-    -d, --debug     keep VM for debugging.
+    -d, --debug     ssh to VM for debugging.
 
 Usage: manage.sh create [OPTION]... [VM]...
   Create VM(s)
@@ -256,7 +256,13 @@ do_build() {
     vagrant up --provision
     vagrant reload # reboot for new kernel
     vagrant ssh -c "sudo sh /vagrant/cleanup.sh"
-    [ "$debug" ] && continue
+
+    if [ "$debug" ]; then
+      vagrant ssh ||:
+      vagrant destroy --force
+      exit
+    fi
+
     vagrant halt
     vagrant package --output "$package"
     [ -f "$package" ] || abort "Not found $package"
