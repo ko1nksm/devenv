@@ -22,6 +22,7 @@ Usage: manage.sh build [OPTION]... [BOX]...
     -a, --all       build all boxes
     -i, --install   install box
     -k, --keep      do not delete package.box after installed
+    -n, --no-cache  do not use cache
     -d, --debug     keep VM for debugging.
 
 Usage: manage.sh create [OPTION]... [VM]...
@@ -221,7 +222,7 @@ list_boxes() {
 }
 
 do_build() {
-  local box install="" keep="" debug="" size boxes package
+  local box install="" keep="" debug="" nocache="" size boxes package
   boxes=$@
 
   for param in "$@"; do
@@ -229,6 +230,7 @@ do_build() {
       -a | --all) boxes=$(list_boxes) ;;
       -i | --install) install=1 ;;
       -k | --keep) keep=1 ;;
+      -n | --no-cache) nocache=1 ;;
       -d | --debug) debug=1 ;;
       -*) abort "Unknown option $param"
     esac
@@ -239,13 +241,14 @@ do_build() {
     [ -d "$BOXESDIR/$box" ] || abort "Not found box directory"
     cd "$BOXESDIR/$box"
 
-    if vagrant box list | grep "$box@latest " >/dev/null; then
-      info "Build from latest box using as cache"
-      info "To remove latest box, run below"
-      info "vagrant box remove \"$box@latest\" --provider virtualbox"
-      export LATEST_BOX_SUFFIX="@latest"
-    else
-      unset LATEST_BOX_SUFFIX
+    unset LATEST_BOX_SUFFIX
+    if [ ! "$nocache" ]; then
+      if vagrant box list | grep "$box@latest " >/dev/null; then
+        info "Build from latest box using as cache"
+        info "To remove latest box, run below"
+        info "vagrant box remove \"$box@latest\" --provider virtualbox"
+        export LATEST_BOX_SUFFIX="@latest"
+      fi
     fi
 
     package="$(echo "$box" | tr "/" "-")-$(date "+%Y.%m.%d.%H%M").box"
