@@ -13,7 +13,9 @@ config.vm.provision "shell", inline: <<-SHELL
   #{BOOTSTRAP(name)}
   load config
   create-partition "/dev/sdc"
+  service docker stop
   mount-partition "DOCKER", "/dev/sdc1" "/var/lib/docker"
+  service docker start
   provide system
   provide upgrade
   provide packages
