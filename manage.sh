@@ -52,8 +52,12 @@ exit
 }
 
 abort() {
-  printf "\033[0;31m%s\033[0;39m\n" "$1"
+  error "$1"
   exit 1
+}
+
+error() {
+  printf "\033[0;31m%s\033[0;39m\n" "$1"
 }
 
 info() {
@@ -66,7 +70,7 @@ yesno() {
     read ans
     case $(echo $ans | tr "[:upper:]" "[:lower:]") in
       y | yes) return 0 ;;
-      n | no) return 1 ;;
+      n | no | "") return 1 ;;
     esac
   done
 }
@@ -93,7 +97,7 @@ vagrant_vmid() {
 }
 
 vbox_detachstorage() {
-  local vm="$1" name="$2" storagectl port device vmid medium
+  local vm="$1" name="$2" option="${3:-}" storagectl port device vmid medium
 
   storagectl=${name%%-*}
   port=${name#*-}
@@ -102,8 +106,16 @@ vbox_detachstorage() {
 
   vmid=$(vagrant_vmid "$vm")
   medium=$(VBoxManage showvminfo "$vmid" --machinereadable | grep "\"$name\"=" | sed "s/[^=]*=//")
-  printf "$vm: Detach storage $storagectl port:$port device:$device (%s)\n" "$medium"
-  VBoxManage storageattach "$vmid" --storagectl "$storagectl" --port "$port" --device "$device" --medium none
+  if [ "$option" = "--dry-run" ]; then
+    printf "$vm: Storage will be Detached [$storagectl port:$port device:$device (%s)]\n" "$medium"
+  else
+    if [ "$medium" = '"none"' ]; then
+      printf "$vm: Already detached [$storagectl port:$port device:$device (%s)]\n" "$medium"
+    else
+      printf "$vm: Detach storage [$storagectl port:$port device:$device (%s)]\n" "$medium"
+      VBoxManage storageattach "$vmid" --storagectl "$storagectl" --port "$port" --device "$device" --medium none
+    fi
+  fi
 }
 
 vbox_getextradata() {
@@ -119,13 +131,13 @@ vbox_getextradata() {
 }
 
 detach_storage() {
-  local vm="$1" line key value
+  local vm="$1" option="${2:-}" line key value
 
   vbox_getextradata "$vm" "vagrant-dev/attach_storage" | while IFS= read -r line; do
     key=${line%%$TAB*}
     value=${line#*$TAB}
     if [ "$value" ]; then
-      vbox_detachstorage "$vm" "$key"
+      vbox_detachstorage "$vm" "$key" "$option"
     fi
   done
 }
@@ -333,15 +345,19 @@ do_upgrade() {
     esac
   done
 
-  if [ "$recreate" -a ! "$force" ]; then
-    yesno "Are you sure you want to recreate VM?" || exit 1
-  fi
-
   for vm in $vms; do
     case $vm in -*) continue; esac
     vmid=$(vagrant_vmid "$vm")
-    [ "$vmid" ] || abort "Specified VM '$vm' is not created by vagrant"
+    if [ ! "$vmid" ]; then
+      error "Specified VM '$vm' is not created by vagrant"
+      continue
+    fi
+
     if [ $recreate ]; then
+      if [ ! "$force" ]; then
+        detach_storage "$vm" --dry-run
+        yesno "Are you sure you want to recreate VM?" || continue
+      fi
       recreate_vm "$vm"
     else
       upgrade_vm "$vm"
@@ -361,14 +377,18 @@ do_remove() {
     esac
   done
 
-  if [ ! "$force" ]; then
-    yesno "Are you sure you want to remove VM?" || exit 1
-  fi
-
   for vm in $vms; do
     case $vm in -*) continue; esac
     vmid=$(vagrant_vmid "$vm")
-    [ "$vmid" ] || abort "Specified VM '$vm' is not created by vagrant"
+    if [ ! "$vmid" ]; then
+      error "Specified VM '$vm' is not created by vagrant"
+      continue
+    fi
+
+    if [ ! "$force" ]; then
+      detach_storage "$vm" --dry-run
+      yesno "Are you sure you want to remove VM?" || continue
+    fi
     remove_vm "$vm"
   done
 }
