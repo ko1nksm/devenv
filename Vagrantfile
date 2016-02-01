@@ -49,7 +49,7 @@ Vagrant.configure(2) do |config|
       #{BOOTSTRAP()}
       load config
       create-partition "/dev/sdb"
-      create-user "#{USERNAME}" "#{USERNAME}" /bin/zsh
+      create-user "#{USERNAME}" "#{USERNAME}" adm,staff,docker,systemd-journal /bin/zsh
       mount-partition "HOME" "/dev/sdb1" "/home/#{USERNAME}" "#{USERNAME}"
       insert-authorized-keys "#{USERNAME}" "#{READ KEY_FILE}"
       create-setup "#{USERNAME}" '#{SETUP}'

@@ -14,7 +14,7 @@ config.vm.provision "shell", inline: <<-SHELL
   load config
   create-partition "/dev/sdc"
   mount-partition "DOCKER", "/dev/sdc1" "/var/lib/docker"
-  provide system #{USERNAME}
+  provide system
   provide upgrade
   provide packages
   provide docker-tools

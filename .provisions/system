@@ -1,7 +1,5 @@
 #!/bin/sh
 
-name=$1
-
 # able to chsh without password
 cat <<'DATA' > /etc/pam.d/chsh
 auth     required   pam_shells.so
@@ -16,7 +14,3 @@ ja_JP.EUC-JP EUC-JP
 ja_JP.UTF-8 UTF-8
 DATA
 locale-gen
-
-if [ "$name" ]; then
-  adduser $name docker
-fi
