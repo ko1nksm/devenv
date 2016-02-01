@@ -60,8 +60,12 @@ error() {
   printf "\033[0;31m%s\033[0;39m\n" "$1"
 }
 
-info() {
+warn() {
   printf "\033[1;33m%s\033[0;39m\n" "$1"
+}
+
+info() {
+  printf "\033[1;32m%s\033[0;39m\n" "$1"
 }
 
 yesno() {
@@ -73,6 +77,10 @@ yesno() {
       n | no | "") return 1 ;;
     esac
   done
+}
+
+unquote() {
+  printf "$1" | sed 's/^"\(.*\)"$/\1/'
 }
 
 vagrant_status() {
@@ -96,6 +104,19 @@ vagrant_vmid() {
   fi
 }
 
+vbox_liststorage() {
+  local vm="$1" vmid name line item
+  vmid=$(vagrant_vmid "$vm")
+
+  printf "$vm: Attached storage list\n"
+  VBoxManage showvminfo "$vmid" --machinereadable | grep "^storagecontrollername" | while read -r line; do
+    name=$(unquote "${line#*=}")
+    VBoxManage showvminfo "$vmid" --machinereadable | grep "\"$name-[0-9]" | while read -r item; do
+      printf "  %s: %s\n" "$(unquote "${item%%=*}")" "$(unquote "${item#*=}")"
+    done
+  done
+}
+
 vbox_detachstorage() {
   local vm="$1" name="$2" option="${3:-}" storagectl port device vmid medium
 
@@ -106,13 +127,14 @@ vbox_detachstorage() {
 
   vmid=$(vagrant_vmid "$vm")
   medium=$(VBoxManage showvminfo "$vmid" --machinereadable | grep "\"$name\"=" | sed "s/[^=]*=//")
+  medium=$(unquote "$medium")
   if [ "$option" = "--dry-run" ]; then
-    printf "$vm: Storage will be Detached [$storagectl port:$port device:$device (%s)]\n" "$medium"
+    printf "$vm: Storage will be detached [$name: %s]\n" "$medium"
   else
-    if [ "$medium" = '"none"' ]; then
-      printf "$vm: Already detached [$storagectl port:$port device:$device (%s)]\n" "$medium"
+    if [ "$medium" = "none" ]; then
+      printf "$vm: Already detached [$name: %s]\n" "$medium"
     else
-      printf "$vm: Detach storage [$storagectl port:$port device:$device (%s)]\n" "$medium"
+      printf "$vm: Detach storage [$name: %s]\n" "$medium"
       VBoxManage storageattach "$vmid" --storagectl "$storagectl" --port "$port" --device "$device" --medium none
     fi
   fi
@@ -354,8 +376,10 @@ do_upgrade() {
     fi
 
     if [ $recreate ]; then
+      vbox_liststorage "$vm"
       if [ ! "$force" ]; then
         detach_storage "$vm" --dry-run
+        warn "Attached storage will be deleted"
         yesno "Are you sure you want to recreate VM?" || continue
       fi
       recreate_vm "$vm"
@@ -385,8 +409,10 @@ do_remove() {
       continue
     fi
 
+    vbox_liststorage "$vm"
     if [ ! "$force" ]; then
       detach_storage "$vm" --dry-run
+      warn "Attached storage will be deleted"
       yesno "Are you sure you want to remove VM?" || continue
     fi
     remove_vm "$vm"
