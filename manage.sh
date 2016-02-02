@@ -80,7 +80,7 @@ yesno() {
 }
 
 unquote() {
-  printf "$1" | sed 's/^"\(.*\)"$/\1/'
+  printf "%s" "$1" | sed 's/^"\(.*\)"$/\1/'
 }
 
 vagrant_status() {
