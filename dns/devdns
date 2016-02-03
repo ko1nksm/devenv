@@ -3,7 +3,7 @@
 IPADDR=$1
 shift
 
-OPT="-e IPADDR=$IPADDR -v /var/cache/bind:/var/cache/bind"
+OPT="-e IPADDR=$IPADDR"
 
 cat <<DATA > /etc/systemd/system/devdns.service
 [Unit]
