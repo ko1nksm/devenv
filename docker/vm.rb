@@ -20,6 +20,7 @@ config.vm.provision "shell", inline: <<-SHELL
   provide upgrade
   provide packages
   provide docker-tools
+  provide docker-config
   provide nsupdate #{$IPADDR_LIST["dns"]}
   provide samba #{$NETWORK}
   provide samba-export #{USERNAME} ~#{USERNAME} #{USERNAME}

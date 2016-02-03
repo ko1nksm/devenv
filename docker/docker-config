@@ -1,0 +1,16 @@
+#!/bin/sh
+
+mkdir -p /etc/systemd/system/docker.service.d
+
+cat <<DATA > /etc/systemd/system/docker.service.d/docker.conf
+[Service]
+ExecStart=
+ExecStart=/usr/bin/docker -d -H fd:// --bip=172.30.0.1/16
+DATA
+
+systemctl daemon-reload
+
+systemctl stop docker
+ip link set docker0 down
+brctl delbr docker0
+systemctl start docker
