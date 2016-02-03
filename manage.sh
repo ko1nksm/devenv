@@ -26,6 +26,13 @@ Usage: manage.sh build [OPTION]... [BOX]...
     -s, --skip      skip provisioning
     -d, --debug     ssh to VM for debugging.
 
+Usage: manage.sh ssh [OPTION]... [BOX]...
+  Login to box(es) for testing
+
+  OPTION:
+    -a, --all       ssh to all boxes
+    -n, --no-cache  do not use cache
+
 Usage: manage.sh create [OPTION]... [VM]...
   Create VM(s)
 
@@ -320,6 +327,40 @@ do_build() {
   done
 }
 
+do_ssh() {
+  local box nocache="" boxes
+  boxes=$@
+
+  for param in "$@"; do
+    case $param in
+      -a | --all) boxes=$(list_boxes) ;;
+      -n | --no-cache) nocache=1 ;;
+      -*) abort "Unknown option $param"
+    esac
+  done
+
+  for box in $boxes; do
+    case $box in -*) continue; esac
+    [ -d "$BOXESDIR/$box" ] || abort "Not found box directory"
+    cd "$BOXESDIR/$box"
+
+    unset LATEST_BOX_SUFFIX
+    if [ ! "$nocache" ]; then
+      if vagrant box list | grep "$box@latest " >/dev/null; then
+        export LATEST_BOX_SUFFIX="@latest"
+      else
+        error "Not found latest box '$box'"
+        continue
+      fi
+    fi
+
+    vagrant halt
+    vagrant up --no-provision
+    vagrant ssh
+    vagrant destroy --force
+  done
+}
+
 list_defined_vms() {
   vagrant_status_list | while IFS= read line; do
     echo ${line%% *}
@@ -428,7 +469,7 @@ done
 
 cd "$BASEDIR"
 case $1 in
-  build)
+  build | ssh)
     if [ $# -eq 1 ]; then
       info "Box name(s) must be specified from list below or specify --all option"
       list_boxes
