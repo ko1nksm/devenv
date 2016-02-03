@@ -12,7 +12,7 @@ After=docker.service
 [Service]
 Type=simple
 Restart=always
-ExecStart=/usr/bin/docker run --name docker-nsupdate -v /var/run/docker.sock:/var/run/docker.sock ko1nksm/docker-nsupdate-plugin exec $DNS_SERVER
+ExecStart=/usr/bin/docker run --name docker-nsupdate -v /var/run/docker.sock:/var/run/docker.sock ko1nksm/docker-nsupdate-plugin exec $DNS_SERVER --domain dev
 ExecStop=/usr/bin/docker stop -t 2 docker-nsupdate ; /usr/bin/docker rm -f docker-nsupdate
 [Install]
 WantedBy=multi-user.target
