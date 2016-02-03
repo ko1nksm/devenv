@@ -23,8 +23,6 @@ Usage: manage.sh build [OPTION]... [BOX]...
     -i, --install   install box
     -k, --keep      do not delete package.box after installed
     -n, --no-cache  do not use cache
-    -s, --skip      skip provisioning
-    -d, --debug     ssh to VM for debugging.
 
 Usage: manage.sh ssh [OPTION]... [BOX]...
   Login to box(es) for testing
@@ -264,7 +262,7 @@ list_boxes() {
 }
 
 do_build() {
-  local box install="" keep="" debug="" nocache="" option="" size boxes package
+  local box install="" keep="" nocache="" size boxes package
   boxes=$@
 
   for param in "$@"; do
@@ -273,8 +271,6 @@ do_build() {
       -i | --install) install=1 ;;
       -k | --keep) keep=1 ;;
       -n | --no-cache) nocache=1 ;;
-      -s | --skip) option="--no-provision" ;;
-      -d | --debug) debug=1 ;;
       -*) abort "Unknown option $param"
     esac
   done
@@ -296,18 +292,11 @@ do_build() {
 
     package="$(echo "$box" | tr "/" "-")@$(date "+%Y.%m.%d.%H%M").box"
     vagrant halt
-    vagrant up $option
+    vagrant up
     if vagrant ssh -c "sh -c '[ -f /vagrant/cleanup.sh ]'"; then
-      vagrant reload $option # reboot for new kernel
+      vagrant reload # reboot for new kernel
       vagrant ssh -c "sudo sh /vagrant/cleanup.sh"
     fi
-
-    if [ "$debug" ]; then
-      vagrant ssh ||:
-      vagrant destroy --force
-      exit
-    fi
-
     vagrant halt
     vagrant package --output "$package"
     [ -f "$package" ] || abort "Not found $package"
