@@ -1,0 +1,24 @@
+#!/bin/sh
+
+DNS_SERVER=$1
+shift
+
+cat <<DATA > /etc/systemd/system/docker-nsupdate.service
+[Unit]
+Description=docker-nsupdate
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=simple
+Restart=always
+ExecStart=/usr/bin/docker run --name docker-nsupdate -v /var/run/docker.sock:/var/run/docker.sock ko1nksm/docker-nsupdate-plugin exec $DNS_SERVER
+ExecStop=/usr/bin/docker stop -t 2 docker-nsupdate ; /usr/bin/docker rm -f docker-nsupdate
+[Install]
+WantedBy=multi-user.target
+DATA
+
+docker pull ko1nksm/docker-nsupdate-plugin
+systemctl daemon-reload
+service docker-nsupdate start
+systemctl enable docker-nsupdate.service
