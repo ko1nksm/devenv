@@ -13,6 +13,7 @@ Vagrant.configure(2) do |config|
   SHELL
 
   config.vm.provider :virtualbox do |vb|
+    vb.customize ["modifyvm", :id, "--nictype1", "Am79C973" ]
     vb.linked_clone = ENV['LATEST_BOX_SUFFIX'] ? true : false
   end
 
