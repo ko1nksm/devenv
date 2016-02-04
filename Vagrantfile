@@ -11,6 +11,7 @@ $IPADDR_LIST = {
   'docker'  => '192.168.33.11',
   'dns'     => '192.168.33.12',
 }
+$DOMAIN = "local.int"
 
 Vagrant.configure(2) do |config|
   config.vm.box = "debian/jessie64@latest"
@@ -58,9 +59,9 @@ Vagrant.configure(2) do |config|
 
     dev.vms(File.dirname(__FILE__)) do |vm, config|
       config.vm.network "private_network", ip: $IPADDR_LIST[vm.name]
-      config.vm.hostname = vm.name + '.local'
+      config.vm.hostname = "#{vm.name}.#{$DOMAIN}"
       config.vm.provider :virtualbox do |vb|
-        vb.name = vm.name + '.local'
+        vb.name = "#{vm.name}.#{$DOMAIN}"
         vb.attach_storage "#{vm.name}-home.vdi", **{
           storagectl: 'IDE Controller',
           port: 0,
