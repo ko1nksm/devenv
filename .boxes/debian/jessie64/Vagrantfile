@@ -60,5 +60,6 @@ Vagrant.configure(2) do |config|
     /vagrant/docker.sh
     apt-get -y autoremove --purge
     apt-get clean
+    echo "Finish provisioning"
   SHELL
 end
