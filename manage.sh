@@ -1,1 +1,0 @@
-vagrant-dev/manage.sh
