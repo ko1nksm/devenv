@@ -8,6 +8,6 @@ config.vm.provision "shell", inline: <<-SHELL
   load config
   provide system
   provide upgrade
-  provide devdns #{$IPADDR_LIST[name]} --zone local --zone dev
+  provide devdns #{$IPADDR_LIST[name]} --zone dev.int
   #{COMPLETE()}
 SHELL
