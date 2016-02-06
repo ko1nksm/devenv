@@ -6,7 +6,7 @@ MACHINE_VERSION=v0.6.0
 # https://github.com/docker/compose/releases/
 COMPOSE_URL=https://github.com/docker/compose/releases/download/$COMPOSE_VERSION/docker-compose-Linux-x86_64
 COMPOSE_PATH=/usr/local/bin/docker-compose
-COMPOSE_CACHE=/vagrant/.cache/docker-compose-Linux-x86_64-$COMPOSE_VERSION
+COMPOSE_CACHE=/vagrant/.cache/${COMPOSE_URL##*/}-$COMPOSE_VERSION
 if [ ! -f $COMPOSE_CACHE ]; then
   curl -sSL $COMPOSE_URL > $COMPOSE_CACHE
 fi
@@ -14,9 +14,9 @@ cp $COMPOSE_CACHE $COMPOSE_PATH
 chmod +x $COMPOSE_PATH
 
 # https://github.com/docker/machine/releases
-MACHINE_URL=https://github.com/docker/machine/releases/download/$MACHINE_VERSION/docker-machine_linux-amd64
+MACHINE_URL=https://github.com/docker/machine/releases/download/$MACHINE_VERSION/docker-machine-Linux-x86_64
 MACHINE_PATH=/usr/local/bin/docker-machine
-MACHINE_CACHE=/vagrant/.cache/docker-machine_linux-amd64-$MACHINE_VERSION
+MACHINE_CACHE=/vagrant/.cache/${MACHINE_URL##*/}-$MACHINE_VERSION
 if [ ! -f $MACHINE_CACHE ]; then
   curl -sSL $MACHINE_URL > $MACHINE_CACHE
 fi
