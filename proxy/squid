@@ -1,0 +1,18 @@
+#!/bin/sh
+
+apt-get install -y squid3
+
+cat <<DATA > /etc/squid3/squid.conf
+http_access allow all
+
+acl all src 0/0
+no_cache deny all
+cache_dir null /dev/null
+cache_store_log none
+
+http_port 3128
+shutdown_lifetime 3 seconds
+pipeline_prefetch on
+DATA
+
+service squid3 restart
