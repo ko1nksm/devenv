@@ -64,9 +64,9 @@ Vagrant.configure(2) do |config|
       config.vm.provider :virtualbox do |vb|
         vb.name = "#{vm.name}.#{$DOMAIN}"
         vb.attach_storage "#{vm.name}-home.vdi", **{
-          storagectl: 'IDE Controller',
-          port: 0,
-          device: 1,
+          storagectl: 'SATA Controller',
+          port: 1,
+          device: 0,
           type: 'hdd',
           size: 10240,
           basedir: $STORAGE_DIR,
