@@ -4,8 +4,8 @@
 Vagrant.configure(2) do |config|
   config.ssh.insert_key = false
 
-  config.vm.box = "debian/jessie64#{ENV['LATEST_BOX_SUFFIX']}"
-  config.vm.box_version = ENV['LATEST_BOX_SUFFIX'] ? "0" : "8.2.1"
+  config.vm.box = ENV['LATEST_BOX'] || "debian/jessie64"
+  config.vm.box_version = ENV['LATEST_BOX'] ? "0" : "8.2.1"
   config.vm.box_check_update = true
 
   config.vm.provision "shell", privileged: false, inline: <<-SHELL
@@ -14,7 +14,7 @@ Vagrant.configure(2) do |config|
 
   config.vm.provider :virtualbox do |vb|
     vb.customize ["modifyvm", :id, "--nictype1", "Am79C973" ]
-    vb.linked_clone = ENV['LATEST_BOX_SUFFIX'] ? true : false
+    vb.linked_clone = ENV['LATEST_BOX'] ? true : false
   end
 
   repourl='http://httpredir.debian.org/debian'
