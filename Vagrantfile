@@ -15,7 +15,7 @@ $IPADDR_LIST = {
 $DOMAIN = "local.int"
 
 Vagrant.configure(2) do |config|
-  config.vm.box = "debian/jessie64@latest"
+  config.vm.box = "debian8"
   config.vm.box_check_update = false
 
   config.vm.define 'default', primary: true
