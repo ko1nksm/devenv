@@ -2,8 +2,6 @@
 
 HOSTS_ALLOW=$1
 
-apt-get install -y samba
-
 cat <<DATA > /etc/samba/smb.conf
 [global]
     domain master = no

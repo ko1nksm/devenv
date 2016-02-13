@@ -4,7 +4,7 @@ set -e
 
 apt-get install -y \
   zsh bash-completion lv vim vim-doc nano- wget curl dnsutils jq \
-  apt-transport-https bridge-utils
+  apt-transport-https bridge-utils samba
 
 apt-get install -y \
   build-essential automake gettext re2c pkg-config libxml2-dev libssl-dev \
