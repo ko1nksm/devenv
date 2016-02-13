@@ -10,6 +10,7 @@ config.vm.provision "shell", inline: <<-SHELL
   load config
   provide system
   provide upgrade
+  provide samba disable
   provide squid
   #{COMPLETE()}
 SHELL

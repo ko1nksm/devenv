@@ -2,6 +2,14 @@
 
 HOSTS_ALLOW=$1
 
+if [ "$STATUS" = "disable" ]; then
+  systemctl stop smbd.service
+  systemctl stop nmbd.service
+  systemctl disable smbd.service
+  systemctl disable nmbd.service
+  exit 0
+fi
+
 cat <<DATA > /etc/samba/smb.conf
 [global]
     domain master = no
