@@ -14,3 +14,13 @@ apt-get -y update
 apt-get -y install docker-engine
 service docker stop
 rm -rf /var/lib/docker/aufs
+
+
+modprobe overlay
+mkdir -p /etc/systemd/system/docker.service.d
+cat <<DATA > /etc/systemd/system/docker.service.d/docker.conf
+[Service]
+ExecStart=
+ExecStart=/usr/bin/docker daemon -H fd:// --storage-driver=overlay
+DATA
+systemctl daemon-reload

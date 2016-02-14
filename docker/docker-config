@@ -5,7 +5,7 @@ mkdir -p /etc/systemd/system/docker.service.d
 cat <<DATA > /etc/systemd/system/docker.service.d/docker.conf
 [Service]
 ExecStart=
-ExecStart=/usr/bin/docker daemon -H fd:// --bip=172.30.0.1/16
+ExecStart=/usr/bin/docker daemon -H fd:// --storage-driver=overlay --bip=172.30.0.1/16
 DATA
 
 systemctl daemon-reload
