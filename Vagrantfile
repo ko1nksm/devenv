@@ -9,6 +9,7 @@ $IPADDR_LIST = {
   'default' => '192.168.33.10',
   'docker'  => '192.168.33.11',
   'dns'     => '192.168.33.12',
+  'centos'   => '192.168.33.127',
   'proxy'   => '192.168.33.254',
 }
 $DOMAIN = "local.int"
@@ -62,10 +63,22 @@ Vagrant.configure(2) do |config|
       config.vm.hostname = "#{vm.name}.#{$DOMAIN}"
       config.vm.provider :virtualbox do |vb|
         vb.name = "#{vm.name}.#{$DOMAIN}"
-        vb.attach_storage "#{vm.name}-home.vdi", **{
-          storagectl: 'SATA Controller',
-          port: 1,
-          device: 0,
+
+        if config.vm.box = "centos7" then
+          pos = {
+            storagectl: 'IDE Controller',
+            port: 0,
+            device: 1,
+          }
+        else
+          pos = {
+            storagectl: 'SATA Controller',
+            port: 1,
+            device: 0,
+          }
+        end
+
+        vb.attach_storage "#{vm.name}-home.vdi", **pos, **{
           type: 'hdd',
           size: 10240,
           basedir: $STORAGE_DIR,

@@ -1,0 +1,40 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# https://github.com/mitchellh/vagrant/issues/6702
+# WORKAROUND
+#
+# Edit $VAGRANT_HOME\embedded\gems\gems\vagrant-1.8.0\plugins\synced_folders\rsync\helper.rb
+#
+# Remove the following codes (line 77~79):
+#
+# "-o ControlMaster=auto " +
+# "-o ControlPath=#{controlpath} " +
+# "-o ControlPersist=10m " +
+
+Vagrant.configure(2) do |config|
+  config.ssh.insert_key = false
+
+  config.vm.box = ENV['LATEST_BOX'] || "centos/7"
+  config.vm.box_version = ENV['LATEST_BOX'] ? "0" : "1601.01"
+  config.vm.box_check_update = true
+  config.vm.hostname = "centos7"
+
+  config.vm.provider :virtualbox do |vb|
+    vb.linked_clone = ENV['LATEST_BOX'] ? true : false
+  end
+
+  config.vm.provision "shell", inline: <<-SHELL
+    set -e
+    yum -y install epel-release
+    yum -y install gcc kernel-devel-$(uname -r) kernel-headers-$(uname -r) dkms make bzip2 wget
+    wget -q http://download.virtualbox.org/virtualbox/5.0.14/VBoxGuestAdditions_5.0.14.iso -O /VBoxGuestAdditions.iso
+    mount /VBoxGuestAdditions.iso -o loop /mnt
+    cd /mnt
+    sh VBoxLinuxAdditions.run --nox11 ||:
+    rm /VBoxGuestAdditions.iso
+    yum -y update
+    /vagrant/packages.sh
+    echo "Finish provisioning"
+  SHELL
+end
