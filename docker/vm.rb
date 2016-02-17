@@ -1,10 +1,5 @@
 config.vm.provider :virtualbox do |vb|
-  vb.attach_storage "docker-data.vdi", **{
-    storagectl: 'SATA Controller',
-    port: 2,
-    device: 0,
-    type: 'hdd',
-    size: 10240,
+  vb.attach_storage "docker-data.vdi", "SATA Controller-2-0", 10240, **{
     basedir: $STORAGE_DIR,
   }
 end
