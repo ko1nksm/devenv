@@ -7,7 +7,7 @@ config.vm.network "forwarded_port", guest: 3128, host: 3128
 
 config.vm.provision "shell", inline: <<-SHELL
   #{BOOTSTRAP(name)}
-  load config
+  include config
   provide system
   provide upgrade
   provide samba disable

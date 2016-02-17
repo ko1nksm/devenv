@@ -11,7 +11,7 @@ end
 
 config.vm.provision "shell", inline: <<-SHELL
   #{BOOTSTRAP(name)}
-  load config
+  include config
   create-partition /dev/sdc
   service docker stop
   mount-partition DOCKER /dev/sdc1 /var/lib/docker
