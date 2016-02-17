@@ -49,11 +49,11 @@ Vagrant.configure(2) do |config|
     config.vm.provision "shell", inline: <<-SHELL
       #{BOOTSTRAP()}
       load config
-      create-partition "/dev/sdb"
-      create-user "#{USERNAME}" "#{USERNAME}" adm,staff,docker,systemd-journal /bin/zsh
-      mount-partition "HOME" "/dev/sdb1" "/home/#{USERNAME}" "#{USERNAME}"
-      insert-authorized-keys "#{USERNAME}" "#{READ KEY_FILE}"
-      create-file "/home/#{USERNAME}/setup.sh" #{USERNAME}:#{USERNAME} 755 #{DATA $SETUP}
+      create-partition /dev/sdb
+      create-user #{USERNAME} #{USERNAME} adm,staff,docker,systemd-journal /bin/zsh
+      mount-partition HOME /dev/sdb1 ~#{USERNAME} #{USERNAME}
+      insert-authorized-keys #{USERNAME} #{READ KEY_FILE}
+      create-file ~#{USERNAME}/setup.sh #{USERNAME}:#{USERNAME} 755 #{DATA $SETUP}
       #{COMPLETE()}
     SHELL
 
