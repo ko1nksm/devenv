@@ -64,13 +64,8 @@ Vagrant.configure(2) do |config|
       config.vm.provider :virtualbox do |vb|
         vb.name = "#{vm.name}.#{$DOMAIN}"
 
-        pos = case config.vm.box
-          when "centos7" then
-            "IDE Controller-0-1"
-          else
-            "SATA Controller-1-0"
-        end
-
+        is_sata = config.vm.box != "centos7"
+        pos = is_sata ? "SATA Controller-1-0" : "IDE Controller-0-1"
         vb.attach_storage "#{vm.name}-home.vdi", pos, 10240, **{
           basedir: $STORAGE_DIR,
         }
