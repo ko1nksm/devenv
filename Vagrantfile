@@ -1,6 +1,5 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
-
 require_relative 'vagrant-dev/vagrant-dev'
 
 $STORAGE_DIR = ENV['HOME']
@@ -54,7 +53,7 @@ Vagrant.configure(2) do |config|
       create-user "#{USERNAME}" "#{USERNAME}" adm,staff,docker,systemd-journal /bin/zsh
       mount-partition "HOME" "/dev/sdb1" "/home/#{USERNAME}" "#{USERNAME}"
       insert-authorized-keys "#{USERNAME}" "#{READ KEY_FILE}"
-      create-setup "#{USERNAME}" '#{SETUP}'
+      create-file "/home/#{USERNAME}/setup.sh" #{USERNAME}:#{USERNAME} 755 #{DATA $SETUP}
       #{COMPLETE()}
     SHELL
 
