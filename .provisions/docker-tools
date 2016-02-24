@@ -1,6 +1,6 @@
 #!/bin/sh
 
-COMPOSE_VERSION=1.6.0
+COMPOSE_VERSION=1.6.1
 MACHINE_VERSION=v0.6.0
 
 # https://github.com/docker/compose/releases/
