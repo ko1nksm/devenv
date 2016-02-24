@@ -11,4 +11,4 @@ apt-get install -y \
   libbz2-dev libsqlite3-dev libpng12-dev libjpeg-dev libmcrypt-dev \
   libtidy-dev libxslt1-dev libpcre3-dev liblzma-dev unixodbc-dev \
   libcurl4-openssl-dev libexpat1-dev libncurses5-dev libncursesw5-dev \
-  tk8.6 libreadline5-
+  tk8.6 libreadline-dev libreadline5-
