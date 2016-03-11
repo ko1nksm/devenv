@@ -2,7 +2,7 @@
 
 set -e
 
-GIT_VERSION=2.7.2
+GIT_VERSION=2.7.3
 TIG_VERSION=tig-2.1.1
 
 MAX_JOBS=$(($(nproc) * 2))
