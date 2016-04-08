@@ -16,7 +16,6 @@ service docker stop
 rm -rf /var/lib/docker/aufs
 
 
-modprobe overlay
 mkdir -p /etc/systemd/system/docker.service.d
 cat <<DATA > /etc/systemd/system/docker.service.d/docker.conf
 [Service]
