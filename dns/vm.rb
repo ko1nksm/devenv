@@ -7,7 +7,6 @@ config.vm.provision "shell", inline: <<-SHELL
   #{BOOTSTRAP(name)}
   include config
   provide system
-  provide upgrade
   provide samba disable
   provide devdns #{$IPADDR_LIST[name]} --zone dev.int
   #{COMPLETE()}

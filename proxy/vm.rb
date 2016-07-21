@@ -9,7 +9,6 @@ config.vm.provision "shell", inline: <<-SHELL
   #{BOOTSTRAP(name)}
   include config
   provide system
-  provide upgrade
   provide samba disable
   provide squid
   #{COMPLETE()}

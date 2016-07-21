@@ -2,7 +2,6 @@ config.vm.provision "shell", inline: <<-SHELL
   #{BOOTSTRAP(name)}
   include config
   provide system
-  provide upgrade
   provide packages
   provide docker-tools
   provide samba #{$NETWORK}
