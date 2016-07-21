@@ -2,6 +2,10 @@
 # vi: set ft=ruby :
 
 Vagrant.configure(2) do |config|
+  if Vagrant.has_plugin?("vagrant-cachier")
+    config.cache.scope = :box
+  end
+
   config.ssh.insert_key = false
 
   config.vm.box = ENV['LATEST_BOX'] || "debian/contrib-jessie64"
@@ -63,7 +67,7 @@ Vagrant.configure(2) do |config|
     /vagrant/jo.sh
     /vagrant/docker.sh
     apt-get -y autoremove --purge
-    apt-get clean
+    readlink /var/cache/apt/archives || apt-get clean
     echo "Finish provisioning"
   SHELL
 end

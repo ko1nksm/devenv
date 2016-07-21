@@ -13,6 +13,10 @@
 # "-o ControlPersist=10m " +
 
 Vagrant.configure(2) do |config|
+  if Vagrant.has_plugin?("vagrant-cachier")
+    config.cache.scope = :box
+  end
+
   config.ssh.insert_key = false
 
   config.vm.box = ENV['LATEST_BOX'] || "centos/7"

@@ -8,7 +8,7 @@ old_kernels=$(dpkg -l | egrep 'linux-(image|headers)-[0-9]' | grep -v $(uname -r
 if [ "$old_kernels" ]; then
   apt-get -y purge $old_kernels
   apt-get -y autoremove
-  apt-get clean
+  readlink /var/cache/apt/archives || apt-get clean
 fi
 
 ln -s -f /dev/null /etc/udev/rules.d/70-persistent-net.rules
