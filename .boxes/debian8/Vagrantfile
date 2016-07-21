@@ -49,10 +49,10 @@ Vagrant.configure(2) do |config|
   config.vm.provision "shell", inline: <<-SHELL
     set -e
     export DEBIAN_FRONTEND=noninteractive
+    export LANG=en_US.utf8
     echo "#{sources_list}" > /etc/apt/sources.list
     echo "#{preferences}" > /etc/apt/preferences
     apt-get -y update
-    apt-get -y upgrade
     apt-get -y dist-upgrade
     apt-get -y install linux-headers-amd64 virtualbox-guest-dkms
     /vagrant/system.sh
