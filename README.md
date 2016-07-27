@@ -146,6 +146,32 @@ vagrant upしてからhaltを行います。
 ./devenv remove default
 ```
 
+## ネットワーク
+
+VMのネットワーク（\*.local.int）として192.168.33.0/24を使用する。
+名前解決はローカルPCにインストールしたunboundによって解決する
+
+dockerコンテナのネットワーク（\*.dev.int）として172.30.0.0/24使用している。
+172.30.0.0/24は192.168.33.11（docker VM）にルーティングされる。
+名前解決はdns.local.int (192.168.33.12) によって解決する。
+
+### OSX設定
+
+ルーティング周り
+
+```
+sudo route -n add 172.30.0.0/24 192.168.33.11
+sudo route -n delete 172.30.0.0/24 192.168.33.11
+netstat -rn
+```
+
+unbound周り
+
+```
+/usr/local/etc/unbound/unbound.conf を設定
+sudo brew services start unbound
+```
+
 ## ライセンス
 
 * vagrant-dev(別リポジトリ)部分は vagrant-devのライセンス(MIT License)に準じます。
